@@ -8,7 +8,7 @@ import FeatureCard from '@/components/FeatureCard'
 
 export default function Home() {
   return (
-    <main className=''>
+    <main className='pt-15'>
       
       <section className='lg:px-8 lg:py-20 xl:px-12 flex lg:gap-8 items-center justify-center bg-muted/10 sm:py-10 sm:px-4'>
 

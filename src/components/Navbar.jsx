@@ -4,7 +4,7 @@ import { Button } from '@base-ui/react';
 
 export default function Navbar() {
   return (
-    <nav className='flex justify-between sm:px-4 sm:py-4 lg:py-0 lg:px-8 xl:px-12 shadow-[0_2px_12px_rgba(0,0,0,0.12)] '>
+    <nav className='flex justify-between sm:px-4 sm:py-4 lg:py-0 lg:px-8 xl:px-12 shadow-[0_2px_12px_rgba(0,0,0,0.12)] fixed top-0 left-0 w-full backdrop-blur-3xl backdrop-saturate-50'>
       
       <div className='flex sm:gap-1 justify-center items-center'>
         <BriefcaseMedical className='text-muted sm:size-6'/>
