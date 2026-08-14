@@ -10,6 +10,7 @@ export default function App() {
       </header>
       <main>
         <Home/>
+
       </main>
     </>
   )

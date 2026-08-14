@@ -11,7 +11,7 @@
 
   --color-primary: #000000;
   --color-muted: #3FA99C;
-  --color-secondary: #111111;
+  --color-secondary: #303030;
 
   --color-paper: #f7fafc;
 
@@ -26,9 +26,9 @@
 
 @layer components{
   .btn-1{
-    @apply text-white sm:text-sm bg-muted sm:px-2.5 sm:py-1 lg:px-3 lg:py-1.5 lg:text-[16px] rounded-full cursor-pointer font-medium ring-muted ring-1;
+    @apply text-white sm:text-sm bg-muted sm:px-2.5 sm:py-1 lg:px-3 lg:py-1.5 lg:text-[16px] rounded-full cursor-pointer font-medium ring-muted ring-1 font-primary;
   }
   .btn-2{
-    @apply text-muted sm:text-sm hover:bg-muted hover:text-white sm:px-2.5 sm:py-1 lg:px-3 lg:py-1.5 lg:text-[16px] rounded-full cursor-pointer font-medium ring-1;
+    @apply text-muted sm:text-sm hover:bg-muted hover:text-white sm:px-2.5 sm:py-1 lg:px-3 lg:py-1.5 lg:text-[16px] rounded-full cursor-pointer font-medium ring-1 font-primary;
   }
 }
