@@ -3,6 +3,7 @@ import Badge from '@/components/Badge'
 import { ArrowRight } from 'lucide-react'
 import homeImageLight from "@/assets/homeImageLight.jpg"
 import ModelCard from '@/components/ModelCard'
+import StepCard from '@/components/StepCard'
 
 export default function Home() {
   return (
@@ -52,7 +53,19 @@ export default function Home() {
         </div>
       </section>
 
+      <section className='sm:py-10 sm:px-4 lg:px-8 lg:py-20 xl:px-12 flex flex-col sm:gap-10 bg-muted/10'>
+        <div className='flex flex-col text-center sm:gap-2'>
+          <h1 className='sm:text-xl md:text-2xl lg:text-3xl font-medium text-primary font-primary'>How It Works?</h1>
+          <p className='sm:text-sm lg:text-lg font-medium text-secondary font-secondary'>The Clinical Workflow is</p>
+        </div>
 
+        <div className='flex flex-col sm:gap-4 lg:grid lg:grid-cols-2 xl:grid-cols-4'>
+          <StepCard faIcon="fa-robot" title={"1. Ingestion"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <StepCard faIcon="fa-robot" title={"2. Processing"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <StepCard faIcon="fa-robot" title={"3. Analysis"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <StepCard faIcon="fa-robot" title={"4. Reporting"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+        </div>
+      </section>
     </main>
   )
 }
