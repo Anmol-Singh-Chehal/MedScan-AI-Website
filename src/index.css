@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -6,10 +7,16 @@
   --breakpoint-sm: 300px;
   --breakpoint-md: 600px;
   --breakpoint-lg: 900px;
+  --breakpoint-xl: 1200px;
 
   --color-primary: #000000;
   --color-muted: #3FA99C;
   --color-secondary: #111111;
+
+  --color-paper: #f7fafc;
+
+   --font-primary: "Inter", sans-serif;
+  --font-secondary: "Open Sans", sans-serif;
 }
 
 .dark {
@@ -19,9 +26,9 @@
 
 @layer components{
   .btn-1{
-    @apply text-white sm:text-sm bg-muted sm:px-2.5 sm:py-1 rounded-full cursor-pointer font-medium ring-muted ring-1;
+    @apply text-white sm:text-sm bg-muted sm:px-2.5 sm:py-1 lg:px-3 lg:py-1.5 lg:text-[16px] rounded-full cursor-pointer font-medium ring-muted ring-1;
   }
   .btn-2{
-    @apply text-muted sm:text-sm hover:bg-muted/10 sm:px-2.5 sm:py-1 rounded-full cursor-pointer font-medium ring-1;
+    @apply text-muted sm:text-sm hover:bg-muted hover:text-white sm:px-2.5 sm:py-1 lg:px-3 lg:py-1.5 lg:text-[16px] rounded-full cursor-pointer font-medium ring-1;
   }
 }
