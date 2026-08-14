@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import homeImageLight from "@/assets/homeImageLight.jpg"
 import ModelCard from '@/components/ModelCard'
 import StepCard from '@/components/StepCard'
+import FeatureCard from '@/components/FeatureCard'
 
 export default function Home() {
   return (
@@ -65,6 +66,37 @@ export default function Home() {
           <StepCard faIcon="fa-robot" title={"3. Analysis"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
           <StepCard faIcon="fa-robot" title={"4. Reporting"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
         </div>
+      </section>
+
+      <section className='sm:py-10 sm:px-4 lg:px-8 lg:py-20 xl:px-12  flex flex-col sm:gap-10'>
+        <div className='flex flex-col text-center sm:gap-2'>
+          <h1 className='sm:text-xl md:text-2xl lg:text-3xl font-medium text-primary font-primary'>Privacy & Security</h1>
+          <p className='sm:text-sm lg:text-lg font-medium text-secondary font-secondary'>Your medical images and patient information are handled with strong security measures designed to protect sensitive healthcare data</p>
+        </div>
+        <FeatureCard
+          points={[
+            {
+              icon: "fa-lock",
+              text: "Your uploaded medical data remains private and is not shared with third parties."
+            },
+            {
+              icon: "fa-shield-halved",
+              text: "Sensitive information is protected using secure data-handling practices."
+            },
+            {
+              icon: "fa-user-shield",
+              text: "Patient information is handled with strict access controls."
+            },
+            {
+              icon: "fa-database",
+              text: "Uploaded files are securely processed and stored according to the platform's data-retention policy."
+            },
+            {
+              icon: "fa-user-secret",
+              text: "We prioritize confidentiality when processing X-ray, MRI, and CT scan data."
+            }
+          ]}
+        />
       </section>
     </main>
   )
