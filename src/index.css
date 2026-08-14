@@ -3,15 +3,25 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  
-}
+  --breakpoint-sm: 300px;
+  --breakpoint-md: 600px;
+  --breakpoint-lg: 900px;
 
-:root {
-  --background: white;
-  --foreground: black;
+  --color-primary: #000000;
+  --color-muted: #3FA99C;
+  --color-secondary: #111111;
 }
 
 .dark {
   --background: black;
   --foreground: white;
+}
+
+@layer components{
+  .btn-1{
+    @apply text-white sm:text-sm bg-muted sm:px-2.5 sm:py-1 rounded-full cursor-pointer font-medium ring-muted ring-1;
+  }
+  .btn-2{
+    @apply text-muted sm:text-sm hover:bg-muted/10 sm:px-2.5 sm:py-1 rounded-full cursor-pointer font-medium ring-1;
+  }
 }

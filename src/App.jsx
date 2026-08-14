@@ -1,9 +1,10 @@
 import React from 'react'
+import Navbar from './components/Navbar'
 
 export default function App() {
   return (
-    <div className='bg-amber-500 text-2xl font-semibold'>
-      Hello Bro.
-    </div>
+    <header>
+      <Navbar/>
+    </header>
   )
 }
