@@ -7,21 +7,23 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { FaBone } from "react-icons/fa";
+import { useTheme } from 'next-themes';
 
 export default function Footer() {
+  const {theme, setTheme} = useTheme(); 
 
   return (
-    <footer className="bg-muted/25">
+    <footer className="bg-paper-2">
 
       <section className='py-15 flex flex-col justify-center items-center gap-2 sm:px-4 lg:px-10'>
         <h1 className='sm:text-2xl lg:text-xl font-medium text-primary text-center font-primary'>Got a leaf that doesn't look right?</h1>
         <p className='sm:text-[16px] lg:text-lg font-secondary text-secondary text-center'>Run your first scan in under a minute, or reach out to our agronomy team for a second opinion.</p>
         <div className='flex lg:gap-4 sm:gap-4'>
-            <button className='font-medium bg-muted text-white flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md cursor-pointer ring-2 ring-muted sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary'>
+            <button className={`font-medium bg-muted ${theme==="light"? "text-white" : "text-paper-1"} flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md cursor-pointer ring-2 ring-muted sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>
               <h3>Try Image Detection</h3>
               <ArrowRight className='sm:size-4'/>
             </button>
-            <button className='font-medium text-muted flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md ring-2  hover:bg-muted hover:text-white hover:ring-2 hover:ring-muted bg-muted/10 ring-muted/40 cursor-pointer sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary'>Learn About Us</button>
+            <button className={`font-medium text-muted flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md ring-2  hover:bg-muted ${theme==="light"? "hover:text-white" : "hover:text-paper-1"} hover:ring-2 hover:ring-muted bg-muted/10 ring-muted/40 cursor-pointer sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>Learn About Us</button>
         </div>
       </section>
 

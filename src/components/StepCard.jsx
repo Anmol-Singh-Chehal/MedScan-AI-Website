@@ -1,20 +1,22 @@
 import React from 'react'
+import { useTheme } from 'next-themes';
 
 export default function StepCard({ faIcon, title, desc }) {
+  const {theme, setTheme} = useTheme(); 
   return (
     <div
-      className="
+      className={`
         group
         flex flex-col
         gap-4
         p-5
-        bg-white
+        ${theme === "light" ? "bg-white": "bg-paper-2"}
         rounded-2xl
         border border-muted/20
         transition-all duration-300
         hover:border-muted/40
         hover:shadow-[0_8px_30px_color-mix(in_srgb,var(--color-muted)_12%,transparent)]
-      "
+      `}
     >
 
       <div className="flex items-center justify-between">

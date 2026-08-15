@@ -1,13 +1,15 @@
 import React from 'react'
-import { Sun, BriefcaseMedical } from "lucide-react";
+import { Sun, BriefcaseMedical, Moon } from "lucide-react";
 import { Button } from '@base-ui/react';
 import { LuHouse, LuMenu, LuPhone, LuScanSearch, LuUsers, LuX } from 'react-icons/lu';
 import { useState, useRef, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 
 export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef(null);
+  const {theme, setTheme} = useTheme();
 
   function toggleMenu() {
     setMenuOpen(!menuOpen);
@@ -49,10 +51,20 @@ export default function Navbar() {
 
       <div className='flex sm:gap-2 items-center justify-center'>
         <button className='sm:size-7 lg:size-8 hover:bg-muted/10 ring-1 rounded-full flex items-center justify-center hover:cursor-pointer text-muted'> 
-          <Sun className='sm:size-6 lg:size-5 text-muted'/> 
+          {theme === "dark" ? (
+            <Sun
+              className="sm:size-6 lg:size-5 text-muted cursor-pointer"
+              onClick={() => setTheme("light")}
+            />
+          ) : (
+            <Moon
+              className="sm:size-6 lg:size-5 text-muted cursor-pointer"
+              onClick={() => setTheme("dark")}
+            />
+          )}
         </button>
-        <Button className={"btn-2 sm:hidden md:flex"}>Login</Button>
-        <Button className={"btn-1"}>Sign Up</Button>
+        <Button className={`btn-2 sm:hidden md:flex ${theme=="dark" && "hover:ring-muted hover:text-paper-1"}`}>Login</Button>
+        <Button className={`btn-1 ${theme==="light"? "text-white": "text-paper-1"}`}>Sign Up</Button>
 
         <LuMenu
           className="
@@ -78,8 +90,7 @@ export default function Navbar() {
           fixed right-0 top-0
           h-screen w-3/5
           z-50
-
-          bg-[#EAF7F5]/95
+          ${theme==="light" ? "bg-[#EAF7F5]/95" : "bg-paper-1"}
           backdrop-blur-2xl
           backdrop-saturate-150
 
@@ -143,7 +154,7 @@ export default function Navbar() {
               font-medium
               font-primary
               transition-all duration-200
-              hover:bg-white/80
+              hover:bg-muted/20
               hover:text-muted
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
               cursor-pointer
@@ -172,7 +183,7 @@ export default function Navbar() {
               font-medium
               font-primary
               transition-all duration-200
-              hover:bg-white/80
+              hover:bg-muted/20
               hover:text-muted
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
               cursor-pointer
@@ -201,7 +212,7 @@ export default function Navbar() {
               font-medium
               font-primary
               transition-all duration-200
-              hover:bg-white/80
+              hover:bg-muted/20
               hover:text-muted
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
               cursor-pointer
@@ -230,7 +241,7 @@ export default function Navbar() {
               font-medium
               font-primary
               transition-all duration-200
-              hover:bg-white/80
+              hover:bg-muted/20
               hover:text-muted
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
               cursor-pointer

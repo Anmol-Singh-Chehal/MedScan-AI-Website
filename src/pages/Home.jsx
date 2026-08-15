@@ -5,12 +5,15 @@ import homeImageLight from "@/assets/homeImageLight.jpg"
 import ModelCard from '@/components/ModelCard'
 import StepCard from '@/components/StepCard'
 import FeatureCard from '@/components/FeatureCard'
+import { useTheme } from 'next-themes';
 
 export default function Home() {
+  const {theme, setTheme} = useTheme(); 
+
   return (
     <main className='pt-15'>
       
-      <section className='lg:px-8 lg:py-20 xl:px-12 flex lg:gap-8 items-center justify-center bg-muted/10 sm:py-10 sm:px-4'>
+      <section className='lg:px-8 lg:py-20 xl:px-12 flex lg:gap-8 items-center justify-center bg-paper-1 sm:py-10 sm:px-4'>
 
         <div className="lg:w-1/2 xl:w-3/5  flex flex-col lg:gap-8 xl:gap-12 sm:gap-6">
           <Badge/>
@@ -23,11 +26,11 @@ export default function Home() {
           </h3>
 
           <div className='flex lg:gap-4 sm:gap-4'>
-            <button className='font-medium bg-muted text-white flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md cursor-pointer ring-2 ring-muted sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary'>
+            <button className={`font-medium bg-muted ${theme==="light"? "text-white" : "text-paper-1"} flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md cursor-pointer ring-2 ring-muted sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>
               <h3>Try Image Detection</h3>
               <ArrowRight className='sm:size-4'/>
             </button>
-            <button className='font-medium text-muted flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md ring-2  hover:bg-muted hover:text-white hover:ring-2 hover:ring-muted bg-muted/10 ring-muted/40 cursor-pointer sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary'>Learn About Us</button>
+            <button className={`font-medium text-muted flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md ring-2  hover:bg-muted ${theme==="light"? "hover:text-white" : "hover:text-paper-1"} hover:ring-2 hover:ring-muted bg-muted/10 ring-muted/40 cursor-pointer sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>Learn About Us</button>
           </div>
         </div>
 
@@ -54,7 +57,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className='sm:py-10 sm:px-4 lg:px-8 lg:py-20 xl:px-12 flex flex-col sm:gap-10 bg-muted/10'>
+      <section className='sm:py-10 sm:px-4 lg:px-8 lg:py-20 xl:px-12 flex flex-col sm:gap-10 bg-paper-1'>
         <div className='flex flex-col text-center sm:gap-2'>
           <h1 className='sm:text-xl md:text-2xl lg:text-3xl font-medium text-primary font-primary'>How It Works?</h1>
           <p className='sm:text-sm lg:text-lg font-medium text-secondary font-secondary'>The Clinical Workflow is</p>
