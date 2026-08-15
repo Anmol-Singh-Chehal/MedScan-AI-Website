@@ -51,16 +51,6 @@ export default function ForgotPassword() {
           </button>
         </form>
 
-        <div className="mt-7 flex justify-center">
-          <NavLink
-            to={"/log-in"}
-            className="flex items-center gap-2 text-sm text-secondary hover:text-muted font-secondary transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="size-4" />
-            Back to login
-          </NavLink>
-        </div>
-
       </section>
     </main>
   );
