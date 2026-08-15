@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Eye, EyeOff, UserRound, Camera, Trash2, ArrowRight, ShieldCheck } from "lucide-react";import { useTheme } from "next-themes";
 import { Input } from "@/components/ui/input";
 import googleIcon from "@/assets/googleIcon.png"
@@ -35,7 +35,7 @@ export default function SignUp() {
   };
 
   return (
-    <main className="min-h-screen bg-paper-1 flex items-center justify-center sm:px-4 lg:px-8 xl:px-12 py-8 mt-15 ">
+    <main className="min-h-screen bg-paper-1 flex items-center justify-center sm:px-4 lg:px-8 xl:px-12 py-8 mt-15">
       
       <div className="w-full max-w-6xl min-h-162.5 lg:grid lg:grid-cols-2 rounded-3xl overflow-hidden bg-paper-1 border border-muted/20 shadow-[0_15px_60px_color-mix(in_srgb,var(--muted)_12%,transparent)]">
 
@@ -81,7 +81,7 @@ export default function SignUp() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center bg-paper-1 sm:px-4 py-6 lg:p-12">
+        <div className="flex items-center justify-center bg-paper-1 sm:px-4 md:px-8 py-6 lg:p-12">
           
           <div className="w-full max-w-lg">
 
@@ -96,9 +96,9 @@ export default function SignUp() {
 
               <p className="mt-2 text-sm text-secondary font-secondary">
                 Already have an account?{" "}
-                <Link to="/login" className="font-semibold text-muted hover:underline">
+                <NavLink to="/log-in" className="font-semibold text-muted hover:underline">
                   Log in
-                </Link>
+                </NavLink>
               </p>
             </div>
 

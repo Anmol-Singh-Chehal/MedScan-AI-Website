@@ -9,6 +9,7 @@ import { Route, Routes } from 'react-router-dom'
 import GoPageTopButton from './components/GoPageTopButton'
 import SignUp from './pages/SignUp'
 import LogIn from './pages/LogIn'
+import ForgotPassword from './pages/ForgotPassword'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
 
         <Route path='/sign-up' element={<SignUp/>}/>
         <Route path='/log-in' element={<LogIn/>}/>
+        <Route path='forgot-password' element={<ForgotPassword/>}/>
       </Routes>
 
       <Footer/>

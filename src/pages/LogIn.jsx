@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Eye, EyeOff, ShieldCheck, ArrowRight, Mail, LockKeyhole } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import googleIcon from "@/assets/googleIcon.png"
@@ -81,9 +81,9 @@ export default function LogIn() {
 
               <p className="mt-2 text-sm text-secondary font-secondary">
                 Don't have an account?{" "}
-                <Link to="/signup" className="font-semibold text-muted hover:underline">
+                <NavLink to="/signup" className="font-semibold text-muted hover:underline">
                   Sign up
-                </Link>
+                </NavLink>
               </p>
 
             </div>
@@ -118,9 +118,9 @@ export default function LogIn() {
                     Password
                   </label>
 
-                  <Link to="/forgot-password" className="text-xs font-medium text-muted hover:underline font-secondary">
+                  <NavLink to="/forgot-password" className="text-xs font-medium text-muted hover:underline font-secondary">
                     Forgot password?
-                  </Link>
+                  </NavLink>
 
                 </div>
 
