@@ -4,9 +4,10 @@ import { Button } from '@base-ui/react';
 import { LuHouse, LuMenu, LuPhone, LuScanSearch, LuUsers, LuX } from 'react-icons/lu';
 import { useState, useRef, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
+  const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef(null);
@@ -65,7 +66,7 @@ export default function Navbar() {
           )}
         </button>
         <Button className={`btn-2 sm:hidden md:flex ${theme=="dark" && "hover:ring-muted hover:text-paper-1"}`}>Login</Button>
-        <Button className={`btn-1 ${theme==="light"? "text-white": "text-paper-1"}`}>Sign Up</Button>
+        <Button className={`btn-1 ${theme==="light"? "text-white": "text-paper-1"}`} onClick={()=>navigate("/sign-up")}>Sign Up</Button>
 
         <LuMenu
           className="

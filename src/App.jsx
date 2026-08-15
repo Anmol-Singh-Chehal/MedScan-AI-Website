@@ -7,6 +7,7 @@ import AboutUs from './pages/AboutUs'
 import ContactUs from './pages/ContactUs'
 import { Route, Routes } from 'react-router-dom'
 import GoPageTopButton from './components/GoPageTopButton'
+import SignUp from './pages/SignUp'
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
         <Route path='/detection' element={<Detection/>}/>
         <Route path='/about-us' element={<AboutUs/>}/>
         <Route path='/contact-us' element={<ContactUs/>}/>
+
+        <Route path='/sign-up' element={<SignUp/>}/>
       </Routes>
 
       <Footer/>
