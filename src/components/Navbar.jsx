@@ -44,12 +44,23 @@ export default function Navbar() {
         <h1 className='text-muted sm:text-lg font-semibold'>MedScan AI</h1>
       </NavLink>
 
-      <ul className='hidden lg:flex md:gap-8'>
-        <li className='font-medium border-b-4 border-muted text-muted py-4 cursor-pointer hover:border-muted/30'>Home</li>
-        <li className='font-medium py-4 cursor-pointer hover:border-b-4 border-muted/30'>About Us</li>
-        <li className='font-medium py-4 cursor-pointer hover:border-b-4 border-muted/30'>Detection</li>
-        <li className='font-medium py-4 cursor-pointer hover:border-b-4 border-muted/30'>Contact Us</li>
-      </ul>
+      <div className="hidden lg:flex md:gap-8">
+        <NavLink to="/" className={({ isActive }) => `font-medium border-b-4 ${isActive ? "border-muted" : "border-transparent"} text-primary py-4 cursor-pointer hover:border-muted/30`}>
+          Home
+        </NavLink>
+
+        <NavLink to="/about-us" className={({ isActive }) => `font-medium border-b-4 ${isActive ? "border-muted" : "border-transparent"} text-primary py-4 cursor-pointer hover:border-muted/30`}>
+          About Us
+        </NavLink>
+
+        <NavLink to="/detection" className={({ isActive }) => `font-medium border-b-4 ${isActive ? "border-muted" : "border-transparent"} text-primary py-4 cursor-pointer hover:border-muted/30`}>
+          Detection
+        </NavLink>
+
+        <NavLink to="/contact-us" className={({ isActive }) => `font-medium border-b-4 ${isActive ? "border-muted" : "border-transparent"} text-primary py-4 cursor-pointer hover:border-muted/30`}>
+          Contact Us
+        </NavLink>
+      </div>
 
       <div className='flex sm:gap-2 items-center justify-center'>
         <button className='sm:size-7 lg:size-8 hover:bg-muted/10 ring-1 rounded-full flex items-center justify-center hover:cursor-pointer text-muted'> 
@@ -147,8 +158,7 @@ export default function Navbar() {
 
           <NavLink to={"/"}
             onClick={toggleMenu}
-            className="
-              group
+            className={({isActive}) => `group
               flex items-center gap-3
               rounded-xl
               px-3 py-3
@@ -158,9 +168,9 @@ export default function Navbar() {
               transition-all duration-200
               hover:bg-muted/20
               hover:text-muted
+              ${isActive && "bg-muted/20"}
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
-              cursor-pointer
-            "
+              cursor-pointer`}
           >
             <LuHouse
               className="
@@ -176,8 +186,7 @@ export default function Navbar() {
 
           <NavLink to={"/detection"}
             onClick={toggleMenu}
-            className="
-              group
+            className={({isActive}) => `group
               flex items-center gap-3
               rounded-xl
               px-3 py-3
@@ -187,9 +196,9 @@ export default function Navbar() {
               transition-all duration-200
               hover:bg-muted/20
               hover:text-muted
+              ${isActive && "bg-muted/20"}
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
-              cursor-pointer
-            "
+              cursor-pointer`}
           >
             <LuScanSearch
               className="
@@ -205,8 +214,7 @@ export default function Navbar() {
 
           <NavLink  to={"/about-us"}
             onClick={toggleMenu}
-            className="
-              group
+            className={({isActive}) => `group
               flex items-center gap-3
               rounded-xl
               px-3 py-3
@@ -216,9 +224,9 @@ export default function Navbar() {
               transition-all duration-200
               hover:bg-muted/20
               hover:text-muted
+              ${isActive && "bg-muted/20"}
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
-              cursor-pointer
-            "
+              cursor-pointer`}
           >
             <LuUsers
               className="
@@ -234,8 +242,7 @@ export default function Navbar() {
 
           <NavLink to={"/contact-us"}
             onClick={toggleMenu}
-            className="
-              group
+            className={({isActive}) => `group
               flex items-center gap-3
               rounded-xl
               px-3 py-3
@@ -245,9 +252,9 @@ export default function Navbar() {
               transition-all duration-200
               hover:bg-muted/20
               hover:text-muted
+              ${isActive && "bg-muted/20"}
               hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
-              cursor-pointer
-            "
+              cursor-pointer`}
           >
             <LuPhone
               className="
