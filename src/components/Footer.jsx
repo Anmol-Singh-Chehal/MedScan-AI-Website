@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa6";
 import { FaBone } from "react-icons/fa";
 import { useTheme } from 'next-themes';
+import { NavLink } from 'react-router-dom';
 
 export default function Footer() {
   const {theme, setTheme} = useTheme(); 
@@ -19,20 +20,20 @@ export default function Footer() {
         <h1 className='sm:text-2xl lg:text-xl font-medium text-primary text-center font-primary'>Got a leaf that doesn't look right?</h1>
         <p className='sm:text-[16px] lg:text-lg font-secondary text-secondary text-center'>Run your first scan in under a minute, or reach out to our agronomy team for a second opinion.</p>
         <div className='flex lg:gap-4 sm:gap-4'>
-            <button className={`font-medium bg-muted ${theme==="light"? "text-white" : "text-paper-1"} flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md cursor-pointer ring-2 ring-muted sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>
+            <NavLink to={"/detection"} className={`font-medium bg-muted ${theme==="light"? "text-white" : "text-paper-1"} flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md cursor-pointer ring-2 ring-muted sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>
               <h3>Try Image Detection</h3>
               <ArrowRight className='sm:size-4'/>
-            </button>
-            <button className={`font-medium text-muted flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md ring-2  hover:bg-muted ${theme==="light"? "hover:text-white" : "hover:text-paper-1"} hover:ring-2 hover:ring-muted bg-muted/10 ring-muted/40 cursor-pointer sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>Learn About Us</button>
+            </NavLink>
+            <NavLink to={"/about-us"} className={`font-medium text-muted flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md ring-2  hover:bg-muted ${theme==="light"? "hover:text-white" : "hover:text-paper-1"} hover:ring-2 hover:ring-muted bg-muted/10 ring-muted/40 cursor-pointer sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}>Learn About Us</NavLink>
         </div>
       </section>
 
       <section className='grid sm:grid-cols-1 md:grid-cols-[2fr_1fr] lg:grid-cols-[2fr_1fr_1fr] gap-10 sm:px-4 lg:px-10'>
         
         <div className='flex flex-col gap-4'>
-          <div className="flex items-center gap-1">
+          <div  className="flex items-center gap-1 cursor-pointer w-fit">
             <BriefcaseMedical className='text-muted sm:size-6'/>
-            <a href="/" className="sm:text-xl text-muted font-medium">MedScan AI</a>
+            <h1 className="sm:text-xl text-muted font-medium">MedScan AI</h1>
           </div>
 
           <p className='sm:text-md font-secondary text-primary text-left'>A field-report style AI assistant that scouts your scans for disease, so you catch trouble before it spreads.</p>

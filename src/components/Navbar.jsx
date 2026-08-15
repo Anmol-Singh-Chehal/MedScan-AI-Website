@@ -4,6 +4,7 @@ import { Button } from '@base-ui/react';
 import { LuHouse, LuMenu, LuPhone, LuScanSearch, LuUsers, LuX } from 'react-icons/lu';
 import { useState, useRef, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import { NavLink } from 'react-router-dom';
 
 export default function Navbar() {
 
@@ -37,10 +38,10 @@ export default function Navbar() {
   return (
     <nav className='flex justify-between sm:px-4 sm:py-4 lg:py-0 lg:px-8 xl:px-12 shadow-[0_2px_12px_rgba(0,0,0,0.12)] fixed top-0 left-0 w-full backdrop-blur-3xl backdrop-saturate-50'>
       
-      <div className='flex sm:gap-1 justify-center items-center'>
+      <NavLink to={"/"} className='flex sm:gap-1 justify-center items-center cursor-pointer'>
         <BriefcaseMedical className='text-muted sm:size-6'/>
         <h1 className='text-muted sm:text-lg font-semibold'>MedScan AI</h1>
-      </div>
+      </NavLink>
 
       <ul className='hidden lg:flex md:gap-8'>
         <li className='font-medium border-b-4 border-muted text-muted py-4 cursor-pointer hover:border-muted/30'>Home</li>
@@ -103,7 +104,7 @@ export default function Navbar() {
       >
         <div className="flex items-center justify-between px-3 py-3">
 
-          <div className="flex items-center gap-2">
+          <NavLink to={"/"} className="flex items-center gap-2 curosr-pointer" onClick={()=>toggleMenu()}>
             <div
               className="
                 size-8
@@ -119,7 +120,7 @@ export default function Navbar() {
             <h1 className="text-[16px] font-semibold font-primary text-muted">
               MedScan AI
             </h1>
-          </div>
+          </NavLink>
 
           <button
             onClick={toggleMenu}
@@ -143,7 +144,7 @@ export default function Navbar() {
 
         <div className="flex flex-col px-3 py-5">
 
-          <button
+          <NavLink to={"/"}
             onClick={toggleMenu}
             className="
               group
@@ -170,9 +171,9 @@ export default function Navbar() {
             />
 
             Home
-          </button>
+          </NavLink>
 
-          <button
+          <NavLink to={"/detection"}
             onClick={toggleMenu}
             className="
               group
@@ -199,9 +200,9 @@ export default function Navbar() {
             />
 
             Detection
-          </button>
+          </NavLink>
 
-          <button
+          <NavLink  to={"/about-us"}
             onClick={toggleMenu}
             className="
               group
@@ -228,9 +229,9 @@ export default function Navbar() {
             />
 
             About Us
-          </button>
+          </NavLink>
 
-          <button
+          <NavLink to={"/contact-us"}
             onClick={toggleMenu}
             className="
               group
@@ -257,7 +258,7 @@ export default function Navbar() {
             />
 
             Contact Us
-          </button>
+          </NavLink>
 
         </div>
       </div>
