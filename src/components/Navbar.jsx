@@ -1,8 +1,37 @@
 import React from 'react'
 import { Sun, BriefcaseMedical } from "lucide-react";
 import { Button } from '@base-ui/react';
+import { LuHouse, LuMenu, LuPhone, LuScanSearch, LuUsers, LuX } from 'react-icons/lu';
+import { useState, useRef, useEffect } from 'react';
 
 export default function Navbar() {
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef(null);
+
+  function toggleMenu() {
+    setMenuOpen(!menuOpen);
+  }
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        menuOpen &&
+        navRef.current &&
+        !navRef.current.contains(event.target)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
+
+
   return (
     <nav className='flex justify-between sm:px-4 sm:py-4 lg:py-0 lg:px-8 xl:px-12 shadow-[0_2px_12px_rgba(0,0,0,0.12)] fixed top-0 left-0 w-full backdrop-blur-3xl backdrop-saturate-50'>
       
@@ -20,10 +49,206 @@ export default function Navbar() {
 
       <div className='flex sm:gap-2 items-center justify-center'>
         <button className='sm:size-7 lg:size-8 hover:bg-muted/10 ring-1 rounded-full flex items-center justify-center hover:cursor-pointer text-muted'> 
-          <Sun className='sm:size-4 lg:size-5 text-muted'/> 
+          <Sun className='sm:size-6 lg:size-5 text-muted'/> 
         </button>
-        <Button className={"btn-2"}>Login</Button>
+        <Button className={"btn-2 sm:hidden md:flex"}>Login</Button>
         <Button className={"btn-1"}>Sign Up</Button>
+
+        <LuMenu
+          className="
+            size-8 md:size-9 lg:hidden
+            p-1
+            rounded-full
+            text-primary
+            hover:text-muted
+            hover:bg-muted/10
+            transition-all duration-200
+            cursor-pointer
+          "
+          onClick={toggleMenu}
+        />
+
+      </div>
+
+
+
+      <div
+        ref={navRef}
+        className={`
+          fixed right-0 top-0
+          h-screen w-3/5
+          z-50
+
+          bg-[#EAF7F5]/95
+          backdrop-blur-2xl
+          backdrop-saturate-150
+
+          border-l border-muted/20
+          shadow-[-10px_0_35px_color-mix(in_srgb,var(--color-muted)_15%,transparent)]
+
+          transition-transform duration-300 ease-in-out
+          ${menuOpen ? "translate-x-0" : "translate-x-full"}
+        `}
+      >
+        <div className="flex items-center justify-between px-3 py-3">
+
+          <div className="flex items-center gap-2">
+            <div
+              className="
+                size-8
+                flex items-center justify-center
+                rounded-xl
+                bg-muted/15
+                ring-1 ring-muted/20
+              "
+            >
+              <BriefcaseMedical className="size-4 text-muted" />
+            </div>
+
+            <h1 className="text-[16px] font-semibold font-primary text-muted">
+              MedScan AI
+            </h1>
+          </div>
+
+          <button
+            onClick={toggleMenu}
+            className="
+              size-9
+              flex items-center justify-center
+              rounded-full
+              text-primary
+              hover:bg-muted/10
+              hover:text-muted
+              transition-all duration-200
+              cursor-pointer
+            "
+          >
+            <LuX className="size-6" />
+          </button>
+
+        </div>
+
+        <div className="mx-3 h-px bg-muted/20" />
+
+        <div className="flex flex-col px-3 py-5">
+
+          <button
+            onClick={toggleMenu}
+            className="
+              group
+              flex items-center gap-3
+              rounded-xl
+              px-3 py-3
+              text-primary
+              font-medium
+              font-primary
+              transition-all duration-200
+              hover:bg-white/80
+              hover:text-muted
+              hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
+              cursor-pointer
+            "
+          >
+            <LuHouse
+              className="
+                size-5
+                text-muted
+                transition-transform duration-200
+                group-hover:scale-110
+              "
+            />
+
+            Home
+          </button>
+
+          <button
+            onClick={toggleMenu}
+            className="
+              group
+              flex items-center gap-3
+              rounded-xl
+              px-3 py-3
+              text-primary
+              font-medium
+              font-primary
+              transition-all duration-200
+              hover:bg-white/80
+              hover:text-muted
+              hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
+              cursor-pointer
+            "
+          >
+            <LuScanSearch
+              className="
+                size-5
+                text-muted
+                transition-transform duration-200
+                group-hover:scale-110
+              "
+            />
+
+            Detection
+          </button>
+
+          <button
+            onClick={toggleMenu}
+            className="
+              group
+              flex items-center gap-3
+              rounded-xl
+              px-3 py-3
+              text-primary
+              font-medium
+              font-primary
+              transition-all duration-200
+              hover:bg-white/80
+              hover:text-muted
+              hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
+              cursor-pointer
+            "
+          >
+            <LuUsers
+              className="
+                size-5
+                text-muted
+                transition-transform duration-200
+                group-hover:scale-110
+              "
+            />
+
+            About Us
+          </button>
+
+          <button
+            onClick={toggleMenu}
+            className="
+              group
+              flex items-center gap-3
+              rounded-xl
+              px-3 py-3
+              text-primary
+              font-medium
+              font-primary
+              transition-all duration-200
+              hover:bg-white/80
+              hover:text-muted
+              hover:shadow-[0_4px_15px_color-mix(in_srgb,var(--color-muted)_8%,transparent)]
+              cursor-pointer
+            "
+          >
+            <LuPhone
+              className="
+                size-5
+                text-muted
+                transition-transform duration-200
+                group-hover:scale-110
+              "
+            />
+
+            Contact Us
+          </button>
+
+        </div>
       </div>
 
     </nav>
