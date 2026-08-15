@@ -17,7 +17,7 @@ export default function Home() {
       <section className='lg:px-8 lg:py-20 xl:px-12 flex lg:gap-8 items-center justify-center bg-paper-1 sm:py-10 sm:px-4'>
 
         <div className="lg:w-1/2 xl:w-3/5  flex flex-col lg:gap-8 xl:gap-12 sm:gap-6">
-          <Badge/>
+          <Badge faIcon={"fa-flask"} tag={"AI-POWERED RESEARCH PLATFORM"}/>
           <div>
             <h1 className='sm:text-3xl lg:text-4xl xl:text-5xl text-primary font-bold font-primary'>Smarter Medical Imaging.</h1>
             <h1 className='sm:text-3xl lg:text-4xl xl:text-5xl text-muted font-bold font-primary'>Faster Insights</h1>
