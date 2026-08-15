@@ -1,8 +1,8 @@
 import React from 'react'
 import Badge from '@/components/Badge'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Brain } from 'lucide-react'
 import homeImageLight from "@/assets/homeImageLight.jpg"
-import ModelCard from '@/components/ModelCard'
+import InfoCard from '@/components/InfoCard'
 import StepCard from '@/components/StepCard'
 import FeatureCard from '@/components/FeatureCard'
 import { useTheme } from 'next-themes';
@@ -49,12 +49,12 @@ export default function Home() {
        </div>
 
         <div className='flex flex-col sm:gap-4 lg:grid lg:grid-cols-2 xl:grid-cols-3'>
-          <ModelCard faIcon="fa-brain" title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
-          <ModelCard faIcon="fa-brain" title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
-          <ModelCard faIcon="fa-brain" title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
-          <ModelCard faIcon="fa-brain" title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
-          <ModelCard faIcon="fa-brain" title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
-          <ModelCard faIcon="fa-brain" title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <InfoCard Icon={Brain} title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <InfoCard Icon={Brain} title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <InfoCard Icon={Brain} title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <InfoCard Icon={Brain} title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <InfoCard Icon={Brain} title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
+          <InfoCard Icon={Brain} title={"Model Efficient-Net-b0"} desc={"Our platform supports various scan types, providing tailored AI analysis workflows for different research needs."}/>
         </div>
       </section>
 
