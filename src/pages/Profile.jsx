@@ -72,14 +72,8 @@ export default function Profile() {
           <section className="rounded-3xl border border-muted/20 bg-paper-2/20 sm:px-4 md:px-8 py-6 lg:p-12">
             <div className="flex flex-col items-center text-center">
 
-              <div className="relative">
-                <div className="size-28 sm:size-32 rounded-full border-2 border-muted/30 bg-paper-1 flex items-center justify-center overflow-hidden">
-                  <UserRound className="size-14 sm:size-16 text-muted" />
-                </div>
-
-                <button type="button" className="absolute bottom-1 right-1 size-9 rounded-full bg-muted text-white flex items-center justify-center border-4 border-paper-1 hover:brightness-110 transition cursor-pointer">
-                  <Pencil className="size-4" />
-                </button>
+              <div className="size-28 sm:size-32 rounded-full border-2 border-muted/30 bg-paper-1 flex items-center justify-center overflow-hidden">
+                <UserRound className="size-14 sm:size-16 text-muted" />
               </div>
 
               <h2 className="mt-5 text-xl sm:text-2xl font-primary font-bold text-primary">

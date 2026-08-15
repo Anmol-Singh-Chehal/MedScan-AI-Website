@@ -1,0 +1,243 @@
+import React, { useRef, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { UserRound, Camera, Trash2, Eye, EyeOff, ArrowLeft, Save, ShieldCheck, FileImage } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useTheme } from "next-themes";
+
+export default function EditProfile() {
+  const { theme } = useTheme();
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const profileInputRef = useRef(null);
+
+  const [fullName, setFullName] = useState("Anmol Singh");
+  const [password, setPassword] = useState("");
+
+  const handleProfileImage = (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file || !file.type.startsWith("image/")) return;
+
+    if (profileImage) {
+      URL.revokeObjectURL(profileImage);
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    setProfileImage(imageUrl);
+  };
+
+  const removeProfileImage = () => {
+    if (profileImage) {
+      URL.revokeObjectURL(profileImage);
+    }
+
+    setProfileImage(null);
+
+    if (profileInputRef.current) {
+      profileInputRef.current.value = "";
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Verify password with your backend first.
+    // If correct, update fullName and profileImage.
+
+    console.log({
+      fullName,
+      password,
+      profileImage,
+    });
+  };
+
+  return (
+    <main className="min-h-screen bg-paper-1 flex items-center justify-center sm:px-4 lg:px-8 xl:px-12 py-8 mt-15">
+
+      <div className="w-full max-w-4xl">
+
+        <div className="mb-6">
+          <NavLink to="/profile" className="inline-flex items-center gap-2 text-sm text-secondary hover:text-muted font-secondary transition cursor-pointer">
+            <ArrowLeft className="size-4" />
+            Back to profile
+          </NavLink>
+        </div>
+
+        <div className="rounded-3xl border border-muted/20 bg-paper-1 shadow-[0_15px_60px_color-mix(in_srgb,var(--muted)_10%,transparent)] overflow-hidden">
+
+          {/* Header */}
+
+          <div className="relative sm:px-4 md:px-8 py-6 lg:p-12 border-b border-muted/15 overflow-hidden">
+
+            <div className="absolute -right-20 -top-24 size-56 rounded-full bg-muted/10 blur-3xl"></div>
+
+            <div>
+              <p className="text-xs uppercase text-muted font-secondary font-semibold">
+                Account settings
+              </p>
+
+              <h1 className="mt-1 text-3xl sm:text-2xl font-primary font-bold text-primary">
+                Edit profile
+              </h1>
+
+              <p className="mt-1 text-xs sm:text-sm text-secondary font-secondary">
+                Update your profile information securely.
+              </p>
+            </div>
+
+          </div>
+
+
+          {/* Form */}
+
+          <form onSubmit={handleSubmit} className="sm:px-4 md:px-8 py-6 lg:p-12">
+
+            <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-8 lg:gap-10">
+
+              {/* Profile Photo */}
+
+              <div className="flex flex-col items-center">
+
+                <label className="text-sm font-semibold text-primary font-primary mb-3">
+                  Profile photo
+                </label>
+
+                <input ref={profileInputRef} type="file" accept="image/*" onChange={handleProfileImage} className="hidden" />
+
+                <div className="relative">
+
+                  <button type="button" onClick={() => profileInputRef.current?.click()} className="size-32 sm:size-36 rounded-full overflow-hidden border-2 border-muted bg-paper-2/20 flex items-center justify-center cursor-pointer hover:bg-muted/10 transition-all duration-300">
+
+                    {profileImage ? (
+                      <img src={profileImage} alt="Profile preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <UserRound className="size-16 text-secondary" />
+                    )}
+
+                  </button>
+
+                  {profileImage && (
+                    <button type="button" onClick={removeProfileImage} className="absolute top-0 right-0 size-7 rounded-full bg-red-500 text-white flex items-center justify-center cursor-pointer hover:bg-red-600 transition">
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  )}
+
+                </div>
+
+                <div className="mt-4 flex items-center gap-2 rounded-full bg-muted/10 px-3 py-1.5 shrink-0 whitespace-nowrap">
+                  <FileImage className="size-4 text-muted shrink-0" />
+
+                  <span className="font-secondary text-xs text-secondary whitespace-nowrap">
+                    PNG · JPG · JPEG · WEBP
+                  </span>
+                </div>
+
+                <button type="button" onClick={() => profileInputRef.current?.click()} className="mt-3 px-3 py-1.5 rounded-full border border-muted/25 text-xs text-muted font-secondary font-medium hover:bg-muted/10 transition cursor-pointer">
+                  Change photo
+                </button>
+
+              </div>
+
+
+              {/* Details */}
+
+              <div className="space-y-5">
+
+                {/* Full Name */}
+
+                <div className="flex flex-col gap-2">
+
+                  <label className="text-sm font-semibold text-primary font-primary">
+                    Full name
+                  </label>
+
+                  <div className="relative">
+
+                    <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-secondary" />
+
+                    <Input value={fullName} onChange={(e) => setFullName(e.target.value)} type="text" placeholder="Enter your full name" className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-10 pr-4 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
+
+                  </div>
+
+                </div>
+
+
+                {/* Password */}
+
+                <div className="pt-3">
+
+                  <div className="mb-4">
+
+                    <div className="flex items-center gap-2">
+
+                      <ShieldCheck className="size-4 text-muted" />
+
+                      <h3 className="text-base font-primary font-semibold text-primary">
+                        Verify your identity
+                      </h3>
+
+                    </div>
+
+                    <p className="mt-1 text-xs sm:text-sm text-secondary font-secondary">
+                      Enter your current password to confirm these profile changes.
+                    </p>
+
+                  </div>
+
+
+                  <div className="flex flex-col gap-2">
+
+                    <label className="text-sm font-semibold text-primary font-primary">
+                      Current password
+                    </label>
+
+                    <div className="relative">
+
+                      <Input value={password} onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} placeholder="Enter your current password" className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 px-4 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
+
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-muted cursor-pointer">
+
+                        {showPassword ? (
+                          <EyeOff className="size-4" />
+                        ) : (
+                          <Eye className="size-4" />
+                        )}
+
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* Actions */}
+
+            <div className="mt-8 pt-6 border-t border-muted/15 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+
+              <NavLink to="/profile" className="h-11 px-5 rounded-xl border border-muted/25 bg-paper-2/10 text-secondary flex items-center justify-center font-primary font-semibold text-sm hover:bg-muted/10 hover:text-primary transition cursor-pointer">
+                Cancel
+              </NavLink>
+
+              <button type="submit" className={`h-11 px-6 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold text-sm cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)]`}>
+                <Save className="size-4" />
+                Save changes
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </main>
+  );
+}
