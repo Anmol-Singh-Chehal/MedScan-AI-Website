@@ -8,6 +8,7 @@ import ContactUs from './pages/ContactUs'
 import { Route, Routes } from 'react-router-dom'
 import GoPageTopButton from './components/GoPageTopButton'
 import SignUp from './pages/SignUp'
+import LogIn from './pages/LogIn'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path='/contact-us' element={<ContactUs/>}/>
 
         <Route path='/sign-up' element={<SignUp/>}/>
+        <Route path='/log-in' element={<LogIn/>}/>
       </Routes>
 
       <Footer/>
