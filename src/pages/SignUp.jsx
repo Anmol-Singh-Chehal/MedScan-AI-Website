@@ -8,6 +8,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import googleIcon from "@/assets/googleIcon.png";
 import facebookIcon from "@/assets/facebookIcon.png";
+import { useNavigate } from "react-router-dom";
+import { useSignupMutation } from "@/services/api";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/features/auth/authSlice";
 
 const signUpSchema = z.object({
   fullName: z.string().trim().min(2, "Full name must contain at least 2 characters").max(50, "Full name cannot exceed 50 characters"),
@@ -27,13 +31,17 @@ export default function SignUp() {
   const [profilePreview, setProfilePreview] = useState(null);
 
   const profileInputRef = useRef(null);
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  const [signup, { isLoading }] = useSignupMutation();
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -104,20 +112,35 @@ export default function SignUp() {
   }, [profilePreview]);
 
   const onSubmit = async (data) => {
-    console.log("Validated data:", data);
+    try {
+      const response = await signup({
+        profile_photo: data.profileImage,
+        full_name: data.fullName,
+        email: data.email,
+        password: data.password,
+        accepts_terms: data.terms,
+      }).unwrap();
 
-    const formData = new FormData();
+      console.log("Signup successful:", response);
 
-    formData.append("fullName", data.fullName);
-    formData.append("email", data.email);
-    formData.append("password", data.password);
+      dispatch(
+        setCredentials({
+          access_token: response.access_token,
+          user: response.user,
+        })
+      );
 
-    if (data.profileImage) {
-      formData.append("profileImage", data.profileImage);
+      console.log("Token stored successfully");
+
+      navigate("/");
+    } catch (error) {
+      console.error("Signup failed:", error);
+
+      console.log(
+        "Signup error:",
+        error?.data?.detail || "Something went wrong"
+      );
     }
-
-    // Later:
-    // await signupMutation(formData).unwrap();
   };
 
   return (
@@ -301,9 +324,9 @@ export default function SignUp() {
                 </div>
               </div>
 
-              <button type="submit" disabled={isSubmitting} className={`w-full h-12 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0`}>
-                {isSubmitting ? "Creating account..." : "Create Account"}
-                {!isSubmitting && <ArrowRight className="size-4" />}
+              <button type="submit" disabled={isLoading} className={`w-full h-12 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0`}>
+                {isLoading ? "Creating account..." : "Create Account"}
+                {!isLoading && <ArrowRight className="size-4" />}
               </button>
 
             </form>
