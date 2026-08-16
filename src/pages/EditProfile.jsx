@@ -1,30 +1,57 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { UserRound, Camera, Trash2, Eye, EyeOff, ArrowLeft, Save, ShieldCheck, FileImage } from "lucide-react";
+import { UserRound, Trash2, Eye, EyeOff, ArrowLeft, Save, ShieldCheck, FileImage } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const editProfileSchema = z.object({
+  fullName: z.string().trim().min(2, "Full name must be at least 2 characters").max(50, "Full name must not exceed 50 characters"),
+  password: z.string().min(1, "Current password is required"),
+  profileImage: z.any().optional(),
+});
 
 export default function EditProfile() {
   const { theme } = useTheme();
+  const profileInputRef = useRef(null);
 
   const [profileImage, setProfileImage] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
-  const profileInputRef = useRef(null);
 
-  const [fullName, setFullName] = useState("Anmol Singh");
-  const [password, setPassword] = useState("");
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(editProfileSchema),
+    defaultValues: {
+      fullName: "Anmol Singh",
+      password: "",
+      profileImage: null,
+    },
+  });
 
   const handleProfileImage = (e) => {
     const file = e.target.files?.[0];
 
-    if (!file || !file.type.startsWith("image/")) return;
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      e.target.value = "";
+      return;
+    }
 
     if (profileImage) {
       URL.revokeObjectURL(profileImage);
     }
 
     const imageUrl = URL.createObjectURL(file);
+
     setProfileImage(imageUrl);
+    setValue("profileImage", file, { shouldValidate: true });
   };
 
   const removeProfileImage = () => {
@@ -33,24 +60,30 @@ export default function EditProfile() {
     }
 
     setProfileImage(null);
+    setValue("profileImage", null);
 
     if (profileInputRef.current) {
       profileInputRef.current.value = "";
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
+    console.log(data);
 
-    // Verify password with your backend first.
-    // If correct, update fullName and profileImage.
-
-    console.log({
-      fullName,
-      password,
-      profileImage,
-    });
+    // Later:
+    // 1. Send current password to backend.
+    // 2. Backend verifies the password.
+    // 3. If correct, update fullName.
+    // 4. Upload profileImage to Cloudinary if a new image exists.
   };
+
+  useEffect(() => {
+    return () => {
+      if (profileImage) {
+        URL.revokeObjectURL(profileImage);
+      }
+    };
+  }, [profileImage]);
 
   return (
     <main className="min-h-screen bg-paper-1 flex items-center justify-center sm:px-4 lg:px-8 xl:px-12 py-8 mt-15">
@@ -65,8 +98,6 @@ export default function EditProfile() {
         </div>
 
         <div className="rounded-3xl border border-muted/20 bg-paper-1 shadow-[0_15px_60px_color-mix(in_srgb,var(--muted)_10%,transparent)] overflow-hidden">
-
-          {/* Header */}
 
           <div className="relative sm:px-4 md:px-8 py-6 lg:p-12 border-b border-muted/15 overflow-hidden">
 
@@ -88,14 +119,9 @@ export default function EditProfile() {
 
           </div>
 
-
-          {/* Form */}
-
-          <form onSubmit={handleSubmit} className="sm:px-4 md:px-8 py-6 lg:p-12">
+          <form onSubmit={handleSubmit(onSubmit)} className="sm:px-4 md:px-8 py-6 lg:p-12">
 
             <div className="grid grid-cols-1 lg:grid-cols-[180px_1fr] gap-8 lg:gap-10">
-
-              {/* Profile Photo */}
 
               <div className="flex flex-col items-center">
 
@@ -103,7 +129,7 @@ export default function EditProfile() {
                   Profile photo
                 </label>
 
-                <input ref={profileInputRef} type="file" accept="image/*" onChange={handleProfileImage} className="hidden" />
+                <input ref={profileInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={handleProfileImage} className="hidden" />
 
                 <div className="relative">
 
@@ -137,18 +163,17 @@ export default function EditProfile() {
                   Change photo
                 </button>
 
+                <p className="mt-2 text-center text-[11px] text-secondary font-secondary">
+                  Maximum size: 5 MB
+                </p>
+
               </div>
-
-
-              {/* Details */}
 
               <div className="space-y-5">
 
-                {/* Full Name */}
-
                 <div className="flex flex-col gap-2">
 
-                  <label className="text-sm font-semibold text-primary font-primary">
+                  <label htmlFor="fullName" className="text-sm font-semibold text-primary font-primary">
                     Full name
                   </label>
 
@@ -156,14 +181,17 @@ export default function EditProfile() {
 
                     <UserRound className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-secondary" />
 
-                    <Input value={fullName} onChange={(e) => setFullName(e.target.value)} type="text" placeholder="Enter your full name" className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-10 pr-4 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
+                    <Input id="fullName" type="text" placeholder="Enter your full name" {...register("fullName")} className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-10 pr-4 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
 
                   </div>
 
+                  {errors.fullName && (
+                    <p className="text-xs text-red-500 font-secondary">
+                      {errors.fullName.message}
+                    </p>
+                  )}
+
                 </div>
-
-
-                {/* Password */}
 
                 <div className="pt-3">
 
@@ -185,16 +213,15 @@ export default function EditProfile() {
 
                   </div>
 
-
                   <div className="flex flex-col gap-2">
 
-                    <label className="text-sm font-semibold text-primary font-primary">
+                    <label htmlFor="password" className="text-sm font-semibold text-primary font-primary">
                       Current password
                     </label>
 
                     <div className="relative">
 
-                      <Input value={password} onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} placeholder="Enter your current password" className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 px-4 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
+                      <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your current password" {...register("password")} className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 px-4 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
 
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-muted cursor-pointer">
 
@@ -208,6 +235,12 @@ export default function EditProfile() {
 
                     </div>
 
+                    {errors.password && (
+                      <p className="text-xs text-red-500 font-secondary">
+                        {errors.password.message}
+                      </p>
+                    )}
+
                   </div>
 
                 </div>
@@ -216,18 +249,15 @@ export default function EditProfile() {
 
             </div>
 
-
-            {/* Actions */}
-
             <div className="mt-8 pt-6 border-t border-muted/15 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
 
               <NavLink to="/profile" className="h-11 px-5 rounded-xl border border-muted/25 bg-paper-2/10 text-secondary flex items-center justify-center font-primary font-semibold text-sm hover:bg-muted/10 hover:text-primary transition cursor-pointer">
                 Cancel
               </NavLink>
 
-              <button type="submit" className={`h-11 px-6 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold text-sm cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)]`}>
+              <button type="submit" disabled={isSubmitting} className={`h-11 px-6 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold text-sm cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-60 disabled:cursor-not-allowed`}>
                 <Save className="size-4" />
-                Save changes
+                {isSubmitting ? "Saving..." : "Save changes"}
               </button>
 
             </div>
