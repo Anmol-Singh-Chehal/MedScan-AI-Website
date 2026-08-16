@@ -8,13 +8,14 @@ from fastapi import (
     Depends
 )
 from app.auth.dependencies import get_current_user
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from app.auth.password import (
     hash_password,
-    verify_password
+    verify_password,
+    generate_reset_code
 )
 from pymongo.errors import DuplicateKeyError
-from app.database.mongodb import users_collection, revoked_tokens_collection
+from app.database.mongodb import users_collection, revoked_tokens_collection, password_resets_collection
 from app.auth.password import hash_password
 from app.services.cloudinary_service import upload_image, delete_image
 from app.auth.jwt import create_access_token
@@ -23,14 +24,19 @@ from app.auth.dependencies import security
 from app.config.settings import settings
 import jwt
 from jwt.exceptions import InvalidTokenError
+from app.auth.send_reset_code_email import send_reset_code_email
+import hashlib
+import secrets
 
-from datetime import datetime, timezone
+def hash_reset_code(code: str):
+    return hashlib.sha256(
+        code.encode()
+    ).hexdigest()
 
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"]
 )
-
 
 @router.post("/sign-up")
 async def signup(
@@ -359,4 +365,208 @@ async def signout(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token"
         )
+
+@router.post("/forgot-password")
+async def forgot_password(
+    email: str = Form(...)
+):
+    email = email.strip().lower()
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is required"
+        )
+
+    user = users_collection.find_one({
+        "email": email
+    })
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Email is not present. Please sign up."
+        )
+
+    code = generate_reset_code()
+    code_hash = hash_reset_code(code)
+    now = datetime.now(timezone.utc)
+    expires_at = now + timedelta(
+        minutes=10
+    )
+
+    password_resets_collection.delete_many({
+        "user_id": user["_id"]
+    })
+    password_resets_collection.insert_one({
+        "user_id": user["_id"],
+        "email": email,
+        "code_hash": code_hash,
+        "expires_at": expires_at,
+        "verified": False,
+        "reset_token": None,
+        "reset_token_expires_at": None,
+        "created_at": now
+    })
+
+    await send_reset_code_email(
+        email,
+        code
+    )
+
+    return {
+        "message": "Password reset code sent successfully"
+    }
+
+@router.post("/verify-code")
+async def verify_code(
+    email: str = Form(...),
+    code: str = Form(...)
+):
+    email = email.strip().lower()
+    code = code.strip()
+
+    reset_request = password_resets_collection.find_one({
+        "email": email
+    })
+
+    if not reset_request:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No password reset request found"
+        )
+
+    now = datetime.now(timezone.utc)
+
+    expires_at = reset_request["expires_at"]
+
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(
+            tzinfo=timezone.utc
+        )
+
+    if now > expires_at:
+        password_resets_collection.delete_one({
+            "_id": reset_request["_id"]
+        })
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Reset code has expired"
+        )
+
+    code_hash = hash_reset_code(code)
+
+    if code_hash != reset_request["code_hash"]:
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid reset code"
+        )
+
+    # Generate short-lived reset token
+    reset_token = secrets.token_urlsafe(32)
+
+    reset_token_expires_at = now + timedelta(
+        minutes=10
+    )
+
+    password_resets_collection.update_one(
+        {
+            "_id": reset_request["_id"]
+        },
+        {
+            "$set": {
+                "verified": True,
+                "reset_token": reset_token,
+                "reset_token_expires_at": reset_token_expires_at
+            }
+        }
+    )
+
+    return {
+        "message": "Code verified successfully",
+        "reset_token": reset_token
+    }
+
+@router.post("/update-password")
+async def update_password(
+    email: str = Form(...),
+    reset_token: str = Form(...),
+    new_password: str = Form(...),
+    confirm_password: str = Form(...)
+):
+
+    email = email.strip().lower()
+
+    if not new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password is required"
+        )
+
+    if len(new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 8 characters long"
+        )
+
+    if new_password != confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Passwords do not match"
+        )
+
+    reset_request = password_resets_collection.find_one({
+        "email": email,
+        "reset_token": reset_token,
+        "verified": True
+    })
+
+    if not reset_request:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid password reset request"
+        )
+
+    now = datetime.now(timezone.utc)
+
+    reset_token_expires_at = reset_request["reset_token_expires_at"]
+
+    if reset_token_expires_at.tzinfo is None:
+        reset_token_expires_at = reset_token_expires_at.replace(
+            tzinfo=timezone.utc
+        )
+
+    if now > reset_token_expires_at:
+        password_resets_collection.delete_one({
+            "_id": reset_request["_id"]
+        })
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Reset code has expired"
+        )
+
+    hashed_password = hash_password(
+        new_password
+    )
+
+    users_collection.update_one(
+        {
+            "_id": reset_request["user_id"]
+        },
+        {
+            "$set": {
+                "password": hashed_password,
+                "updated_at": now
+            }
+        }
+    )
+
+    password_resets_collection.delete_one({
+        "_id": reset_request["_id"]
+    })
+
+    return {
+        "message": "Password updated successfully"
+    }
+
 

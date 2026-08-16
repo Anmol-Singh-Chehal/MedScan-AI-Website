@@ -9,6 +9,7 @@ db = client[settings.MONGODB_DATABASE]
 users_collection = db["users"]
 scans_collection = db["scans"]
 revoked_tokens_collection = db["revoked_tokens"]
+password_resets_collection = db["password_resets"]
 
 users_collection.create_index(
     "email",
@@ -22,4 +23,9 @@ scans_collection.create_index(
 revoked_tokens_collection.create_index(
     "jti",
     unique=True
+)
+
+password_resets_collection.create_index(
+    "expires_at",
+    expireAfterSeconds=0
 )
