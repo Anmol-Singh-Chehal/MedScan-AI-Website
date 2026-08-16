@@ -6,6 +6,10 @@ import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUser } from "@/features/auth/authSlice.js";
+import { useEditProfileMutation } from "@/services/api.js";
+import { useNavigate } from "react-router-dom";
 
 const editProfileSchema = z.object({
   fullName: z.string().trim().min(2, "Full name must be at least 2 characters").max(50, "Full name must not exceed 50 characters"),
@@ -17,13 +21,20 @@ export default function EditProfile() {
   const { theme } = useTheme();
   const profileInputRef = useRef(null);
 
-  const [profileImage, setProfileImage] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const [editProfile, { isLoading }] = useEditProfileMutation();
+  const [profileImage, setProfileImage] = useState(
+    user?.profile_photo || null
+  );
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
-      fullName: "Anmol Singh",
+      fullName: "",
       password: "",
       profileImage: null,
     },
@@ -44,22 +55,28 @@ export default function EditProfile() {
       return;
     }
 
-    if (profileImage) {
+    if (profileImage?.startsWith("blob:")) {
       URL.revokeObjectURL(profileImage);
     }
 
     const imageUrl = URL.createObjectURL(file);
 
+    setSelectedFile(file);
     setProfileImage(imageUrl);
-    setValue("profileImage", file, { shouldValidate: true });
+
+    setValue("profileImage", file, {
+      shouldValidate: true,
+    });
   };
 
   const removeProfileImage = () => {
-    if (profileImage) {
+    if (profileImage?.startsWith("blob:")) {
       URL.revokeObjectURL(profileImage);
     }
 
     setProfileImage(null);
+    setSelectedFile(null);
+
     setValue("profileImage", null);
 
     if (profileInputRef.current) {
@@ -68,13 +85,27 @@ export default function EditProfile() {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
+    try {
+      const result = await editProfile({
+        profile_photo: selectedFile,
+        full_name: data.fullName,
+        current_password: data.password,
+      }).unwrap();
 
-    // Later:
-    // 1. Send current password to backend.
-    // 2. Backend verifies the password.
-    // 3. If correct, update fullName.
-    // 4. Upload profileImage to Cloudinary if a new image exists.
+      console.log("Profile updated:", result);
+
+      dispatch(updateUser(result.user));
+      alert("Profile updated successfully!");
+      navigate("/profile");
+
+    } catch (error) {
+      console.error("Profile update failed:", error);
+
+      alert(
+        error?.data?.detail ||
+        "Failed to update profile. Please try again."
+      );
+    }
   };
 
   useEffect(() => {

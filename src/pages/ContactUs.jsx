@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import ContactInfoCard from "@/components/ContactInfoCard";
 import Badge from "@/components/Badge";
+import { useContactUsMutation } from "@/services/api.js";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -17,12 +18,36 @@ const contactSchema = z.object({
 });
 
 export default function ContactUs() {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(contactSchema),
   });
+  const [contactUs, { isLoading }] = useContactUsMutation();
 
   const onSubmit = async (data) => {
-    console.log(data);
+    try {
+      const result = await contactUs({
+        name: data.name.trim(),
+        subject: data.subject.trim(),
+        message: data.message.trim(),
+      }).unwrap();
+
+      console.log("Message sent successfully:", result);
+
+      alert(
+        result?.message ||
+        "Your message has been sent successfully."
+      );
+
+      reset();
+
+    } catch (error) {
+      console.error("Contact form error:", error);
+
+      alert(
+        error?.data?.detail ||
+        "Failed to send your message. Please try again."
+      );
+    }
   };
 
   return (
@@ -109,10 +134,14 @@ export default function ContactUs() {
               </p>
             </div>
 
-            <button type="submit" disabled={isSubmitting} className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-muted px-5 py-3 font-primary text-sm font-semibold text-paper-1 shadow-[0_6px_20px_color-mix(in_srgb,var(--color-muted)_20%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_25px_color-mix(in_srgb,var(--color-muted)_28%,transparent)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60">
-              {isSubmitting ? "Sending..." : "Send Message"}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-muted px-5 py-3 font-primary text-sm font-semibold text-paper-1 shadow-[0_6px_20px_color-mix(in_srgb,var(--color-muted)_20%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_10px_25px_color-mix(in_srgb,var(--color-muted)_28%,transparent)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isLoading ? "Sending..." : "Send Message"}
 
-              {!isSubmitting && (
+              {!isLoading && (
                 <Send className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
               )}
             </button>
