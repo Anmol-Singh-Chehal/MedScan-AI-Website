@@ -18,3 +18,8 @@ users_collection.create_index(
 scans_collection.create_index(
     [("user_id", 1), ("created_at", -1)]
 )
+
+revoked_tokens_collection.create_index(
+    "jti",
+    unique=True
+)

@@ -335,17 +335,23 @@ async def signout(
                 detail="Invalid token"
             )
 
-        revoked_tokens_collection.insert_one({
-            "jti": jti,
-            "expires_at": datetime.fromtimestamp(
-                exp,
-                timezone.utc
-            ),
-            "revoked_at": datetime.now(timezone.utc)
-        })
+        try:
+            revoked_tokens_collection.insert_one({
+                "jti": jti,
+                "expires_at": datetime.fromtimestamp(
+                    exp,
+                    timezone.utc
+                ),
+                "revoked_at": datetime.now(timezone.utc)
+            })
+
+        except DuplicateKeyError:
+            return {
+                "message": "Already logged out"
+            }
 
         return {
-            "message": "Successfully signed out"
+            "message": "Successfully logged out"
         }
 
     except InvalidTokenError:
