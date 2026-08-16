@@ -26,3 +26,11 @@ def upload_image(
         "public_id": result["public_id"],
         "url": result["secure_url"]
     }
+
+def delete_image(public_id: str):
+
+    result = cloudinary.uploader.destroy(
+        public_id
+    )
+
+    return result

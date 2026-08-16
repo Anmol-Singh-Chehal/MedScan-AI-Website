@@ -4,8 +4,10 @@ from fastapi import (
     File,
     Form,
     HTTPException,
-    status
+    status,
+    Depends
 )
+from app.auth.dependencies import get_current_user
 from datetime import datetime, timezone
 from app.auth.password import (
     hash_password,
@@ -14,7 +16,7 @@ from app.auth.password import (
 from pymongo.errors import DuplicateKeyError
 from app.database.mongodb import users_collection
 from app.auth.password import hash_password
-from app.services.cloudinary_service import upload_image
+from app.services.cloudinary_service import upload_image, delete_image
 from app.auth.jwt import create_access_token
 
 router = APIRouter(
@@ -81,7 +83,8 @@ async def signup(
         "email": email,
         "password": hashed_password,
         "accepts_terms": accepts_terms,
-        "created_at": datetime.now(timezone.utc)
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc)
     }
 
 
@@ -148,7 +151,6 @@ async def signup(
         }
     }
 
-
 @router.post("/log-in")
 async def login(
     email: str = Form(...),
@@ -201,3 +203,107 @@ async def login(
             ).get("url")
         }
     }
+
+@router.put("/edit-profile")
+async def edit_profile(
+    profile_photo: UploadFile = File(...),
+    full_name: str = Form(...),
+    current_password: str = Form(...),
+    current_user=Depends(get_current_user)
+):
+
+    full_name = full_name.strip()
+
+    if not full_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Full name is required"
+        )
+
+    if not current_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is required"
+        )
+
+    password_valid = verify_password(
+        current_password,
+        current_user["password"]
+    )
+
+    if not password_valid:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect"
+        )
+
+    user_id = str(current_user["_id"])
+    old_profile_photo = current_user.get(
+        "profile_photo"
+    )
+
+    try:
+        new_profile_result = upload_image(
+            profile_photo,
+            f"medscan-ai/users/{user_id}/profile"
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload new profile photo"
+        )
+
+    try:
+        users_collection.update_one(
+            {
+                "_id": current_user["_id"]
+            },
+            {
+                "$set": {
+                    "full_name": full_name,
+                    "profile_photo": new_profile_result,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+
+    except Exception:
+        delete_image(
+            new_profile_result["public_id"]
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update profile"
+        )
+
+    if old_profile_photo:
+        old_public_id = old_profile_photo.get(
+            "public_id"
+        )
+
+        if old_public_id:
+            try:
+                delete_image(
+                    old_public_id
+                )
+
+            except Exception as e:
+                print(
+                    f"Failed to delete old profile photo: {e}"
+                )
+
+    return {
+        "message": "Profile updated successfully",
+
+        "user": {
+            "id": user_id,
+            "full_name": full_name,
+            "email": current_user["email"],
+            "profile_photo": new_profile_result["url"],
+            "created_at": current_user["created_at"],
+            "updated_at": datetime.now(timezone.utc)
+        }
+    }
+
