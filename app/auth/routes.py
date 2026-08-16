@@ -6,15 +6,16 @@ from fastapi import (
     HTTPException,
     status
 )
-
+from datetime import datetime, timezone
+from app.auth.password import (
+    hash_password,
+    verify_password
+)
 from pymongo.errors import DuplicateKeyError
-
 from app.database.mongodb import users_collection
-
 from app.auth.password import hash_password
-
 from app.services.cloudinary_service import upload_image
-
+from app.auth.jwt import create_access_token
 
 router = APIRouter(
     prefix="/auth",
@@ -79,7 +80,8 @@ async def signup(
         "full_name": full_name,
         "email": email,
         "password": hashed_password,
-        "accepts_terms": accepts_terms
+        "accepts_terms": accepts_terms,
+        "created_at": datetime.now(timezone.utc)
     }
 
 
@@ -128,13 +130,74 @@ async def signup(
         }
     )
 
+    access_token = create_access_token(
+        user_id
+    )
+
     return {
 
         "message": "User successfully registered",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in_days": 7,
         "user": {
             "id": user_id,
             "full_name": full_name,
             "email": email,
             "profile_photo": profile_result["url"]
+        }
+    }
+
+
+@router.post("/log-in")
+async def login(
+    email: str = Form(...),
+    password: str = Form(...)
+):
+
+    email = email.strip().lower()
+
+    user = users_collection.find_one(
+        {
+            "email": email
+        }
+    )
+
+    if not user:
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    password_valid = verify_password(
+        password,
+        user["password"]
+    )
+
+    if not password_valid:
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    access_token = create_access_token(
+        str(user["_id"])
+    )
+
+    return {
+        "message": "Login successful",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in_days": 7,
+        "user": {
+            "id": str(user["_id"]),
+            "full_name": user["full_name"],
+            "email": user["email"],
+            "profile_photo": user.get(
+                "profile_photo",
+                {}
+            ).get("url")
         }
     }
