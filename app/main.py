@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from app.database.mongodb import client
+from app.services.cloudinary_service import upload_image
 
 app = FastAPI(
     title="MedScan AI",
@@ -31,3 +32,25 @@ def health_check():
             "database": "disconnected",
             "error": str(e)
         }
+
+@app.post("/upload")
+async def upload_images(
+    images: list[UploadFile] = File(...)
+):
+
+    uploaded_files = []
+
+    for file in images:
+
+        result = upload_image(file)
+
+        uploaded_files.append({
+            "filename": file.filename,
+            "content_type": file.content_type,
+            "cloudinary": result
+        })
+
+    return {
+        "message": "Files uploaded successfully",
+        "files": uploaded_files
+    }
