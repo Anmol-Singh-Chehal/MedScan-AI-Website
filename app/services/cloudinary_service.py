@@ -11,13 +11,18 @@ cloudinary.config(
     secure=True
 )
 
-def upload_image(file):
+
+def upload_image(
+    file,
+    folder: str
+):
+
     result = cloudinary.uploader.upload(
         file.file,
-        folder="medscan-ai/"
+        folder=folder
     )
 
     return {
         "public_id": result["public_id"],
-        "url": result["secure_url"],
+        "url": result["secure_url"]
     }

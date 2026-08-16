@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from app.database.mongodb import client
 from app.services.cloudinary_service import upload_image
+from app.auth.routes import router as auth_router
 
 app = FastAPI(
     title="MedScan AI",
@@ -8,6 +9,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.include_router(
+    auth_router
+)
 
 @app.get("/")
 def root():
