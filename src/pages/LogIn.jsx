@@ -8,6 +8,10 @@ import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useLoginMutation } from "@/services/api.js";
+import { setCredentials } from "@/features/auth/authSlice.js";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address."),
@@ -18,11 +22,14 @@ const loginSchema = z.object({
 export default function LogIn() {
   const { theme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginUser, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -32,8 +39,33 @@ export default function LogIn() {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log("Login data:", data);
+  const onSubmit = async (data) => {
+    try {
+      const result = await loginUser({
+        email: data.email,
+        password: data.password,
+      }).unwrap();
+
+      console.log("Login successful:", result);
+
+      dispatch(
+        setCredentials({
+          access_token: result.access_token,
+          user: result.user,
+          rememberMe: data.rememberMe,
+        })
+      );
+
+      navigate("/");
+
+    } catch (error) {
+      console.error("Login failed:", error);
+
+      alert(
+        error?.data?.detail ||
+        "Unable to login. Please check your email and password."
+      );
+    }
   };
 
   return (
@@ -88,8 +120,6 @@ export default function LogIn() {
           </div>
         </div>
 
-
-        {/* Right Side */}
         <div className="flex items-center justify-center bg-paper-1 sm:px-4 md:px-8 py-12 lg:p-12">
 
           <div className="w-full max-w-lg">
@@ -116,7 +146,6 @@ export default function LogIn() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-              {/* Email */}
               <div className="flex flex-col gap-2">
 
                 <label className="text-sm font-semibold text-primary font-primary">
@@ -144,8 +173,6 @@ export default function LogIn() {
 
               </div>
 
-
-              {/* Password */}
               <div className="flex flex-col gap-2">
 
                 <div className="flex justify-between items-center">
@@ -191,8 +218,6 @@ export default function LogIn() {
 
               </div>
 
-
-              {/* Remember */}
               <div className="flex items-center gap-2">
 
                 <input
@@ -207,16 +232,14 @@ export default function LogIn() {
 
               </div>
 
-
-              {/* Login Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isLoading}
                 className={`w-full h-12 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-60 disabled:cursor-not-allowed`}
               >
-                {isSubmitting ? "Logging in..." : "Log In"}
+                {isLoading ? "Logging in..." : "Log In"}
 
-                {!isSubmitting && <ArrowRight className="size-4" />}
+                {!isLoading && <ArrowRight className="size-4" />}
 
               </button>
 

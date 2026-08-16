@@ -24,7 +24,9 @@ export const api = createApi({
       query: ({ profile_photo, full_name, email, password, accepts_terms }) => {
         const formData = new FormData();
 
-        formData.append("profile_photo", profile_photo);
+        if (profile_photo) {
+          formData.append("profile_photo", profile_photo);
+        }
         formData.append("full_name", full_name);
         formData.append("email", email);
         formData.append("password", password);
@@ -78,10 +80,6 @@ export const api = createApi({
       }),
     }),
 
-    // =========================
-    // PASSWORD RESET
-    // =========================
-
     forgotPassword: builder.mutation({
       query: ({ email }) => {
         const formData = new FormData();
@@ -132,10 +130,6 @@ export const api = createApi({
         };
       },
     }),
-
-    // =========================
-    // CONTACT US
-    // =========================
 
     contactUs: builder.mutation({
       query: ({ name, subject, message }) => {
