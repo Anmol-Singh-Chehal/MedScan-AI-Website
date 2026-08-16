@@ -1,14 +1,13 @@
 import React from "react";
-import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
+import { Mail, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
-import { NavLink } from "react-router-dom";
 
 export default function ForgotPassword() {
   const { theme } = useTheme();
 
   return (
-    <main className="min-h-screen bg-paper-1 flex items-center justify-center  sm:px-4 lg:px-8 xl:px-12 py-8">
+    <main className="min-h-screen bg-paper-1 flex items-center justify-center sm:px-4 lg:px-8 xl:px-12 py-8">
       <section className="w-full max-w-2xl rounded-3xl border border-muted/20 bg-paper-2/20 sm:px-4 md:px-8 py-6 lg:p-12 shadow-[0_20px_60px_color-mix(in_srgb,var(--muted)_8%,transparent)]">
 
         <div className="mb-8">
@@ -34,18 +33,11 @@ export default function ForgotPassword() {
             <div className="relative">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-secondary" />
 
-              <Input
-                type="email"
-                placeholder="you@example.com"
-                className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-11 pr-4 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary"
-              />
+              <Input type="email" placeholder="you@example.com" className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-11 pr-4 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
             </div>
           </div>
 
-          <button
-            type="submit"
-            className={`w-full h-12 rounded-full bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)]`}
-          >
+          <button type="submit" className={`w-full h-12 rounded-full bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)]`}>
             Send Reset Link
             <ArrowRight className="size-4" />
           </button>

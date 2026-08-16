@@ -2,21 +2,46 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Eye, EyeOff, ShieldCheck, ArrowRight, Mail, LockKeyhole } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import googleIcon from "@/assets/googleIcon.png"
-import facebookIcon from "@/assets/facebookIcon.png"
+import googleIcon from "@/assets/googleIcon.png";
+import facebookIcon from "@/assets/facebookIcon.png";
 import { useTheme } from "next-themes";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const loginSchema = z.object({
+  email: z.email("Please enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+  rememberMe: z.boolean(),
+});
 
 export default function LogIn() {
-  const {theme, setTheme} = useTheme();
+  const { theme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
+  });
+
+  const onSubmit = (data) => {
+    console.log("Login data:", data);
+  };
 
   return (
     <main className="min-h-screen bg-paper-1 flex items-center justify-center sm:px-4 lg:px-8 xl:px-12 sm:mt-15">
 
       <div className="w-full max-w-6xl min-h-155 lg:grid lg:grid-cols-2 rounded-3xl overflow-hidden bg-paper-1 border border-muted/20 shadow-[0_15px_60px_color-mix(in_srgb,var(--muted)_12%,transparent)]">
 
-        {/* Left Side */}
-        <div className={`hidden lg:flex relative ${theme==="light"? "bg-teal-900": "bg-paper-2"} overflow-hidden`}>
+        <div className={`hidden lg:flex relative ${theme === "light" ? "bg-teal-900" : "bg-paper-2"} overflow-hidden`}>
 
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,color-mix(in_srgb,var(--muted)_28%,transparent),transparent_45%)]"></div>
 
@@ -89,7 +114,7 @@ export default function LogIn() {
             </div>
 
 
-            <form className="space-y-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
               {/* Email */}
               <div className="flex flex-col gap-2">
@@ -102,9 +127,20 @@ export default function LogIn() {
 
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-secondary" />
 
-                  <Input type="email" placeholder="you@example.com" className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-10 pr-4 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
+                  <Input
+                    type="email"
+                    placeholder="you@example.com"
+                    {...register("email")}
+                    className={`w-full h-12 rounded-xl border ${errors.email ? "border-red-500" : "border-muted/25"} bg-paper-2/20 pl-10 pr-4 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary`}
+                  />
 
                 </div>
+
+                {errors.email && (
+                  <p className="text-xs text-red-500 font-secondary">
+                    {errors.email.message}
+                  </p>
+                )}
 
               </div>
 
@@ -128,7 +164,12 @@ export default function LogIn() {
 
                   <LockKeyhole className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-secondary" />
 
-                  <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-10 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary" />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    {...register("password")}
+                    className={`w-full h-12 rounded-xl border ${errors.password ? "border-red-500" : "border-muted/25"} bg-paper-2/20 pl-10 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary`}
+                  />
 
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-muted cursor-pointer">
 
@@ -142,13 +183,23 @@ export default function LogIn() {
 
                 </div>
 
+                {errors.password && (
+                  <p className="text-xs text-red-500 font-secondary">
+                    {errors.password.message}
+                  </p>
+                )}
+
               </div>
 
 
               {/* Remember */}
               <div className="flex items-center gap-2">
 
-                <input type="checkbox" className="size-4 accent-muted cursor-pointer" />
+                <input
+                  type="checkbox"
+                  {...register("rememberMe")}
+                  className="size-4 accent-muted cursor-pointer"
+                />
 
                 <span className="text-xs text-secondary font-secondary">
                   Remember me
@@ -158,11 +209,14 @@ export default function LogIn() {
 
 
               {/* Login Button */}
-              <button type="submit" className={`w-full h-12 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)]`}>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full h-12 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-60 disabled:cursor-not-allowed`}
+              >
+                {isSubmitting ? "Logging in..." : "Log In"}
 
-                Log In
-
-                <ArrowRight className="size-4" />
+                {!isSubmitting && <ArrowRight className="size-4" />}
 
               </button>
 
@@ -187,12 +241,12 @@ export default function LogIn() {
             <div className="grid grid-cols-2 gap-3">
 
               <button type="button" className="h-11 rounded-xl border border-muted/20 bg-paper-2/10 text-primary font-secondary text-sm font-medium hover:bg-muted/10 transition cursor-pointer flex items-center justify-center gap-2">
-                <img src={googleIcon} alt="google" className="sm:size-6 lg:size-8"/>
+                <img src={googleIcon} alt="google" className="sm:size-6 lg:size-8" />
                 Google
               </button>
 
               <button type="button" className="h-11 rounded-xl border border-muted/20 bg-paper-2/10 text-primary font-secondary text-sm font-medium hover:bg-muted/10 transition cursor-pointer flex items-center justify-center gap-2">
-                <img src={facebookIcon} alt="facebook" className="sm:size-6 lg:size-8"/>
+                <img src={facebookIcon} alt="facebook" className="sm:size-6 lg:size-8" />
                 Facebook
               </button>
 
