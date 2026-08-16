@@ -15,7 +15,7 @@ from app.auth.password import (
     generate_reset_code
 )
 from pymongo.errors import DuplicateKeyError
-from app.database.mongodb import users_collection, revoked_tokens_collection, password_resets_collection
+from app.database.mongodb import users_collection, revoked_tokens_collection, password_resets_collection, queries_collection
 from app.auth.password import hash_password
 from app.services.cloudinary_service import upload_image, delete_image
 from app.auth.jwt import create_access_token
@@ -569,4 +569,53 @@ async def update_password(
         "message": "Password updated successfully"
     }
 
+@router.post("/contact-us")
+async def contact_us(
+    name: str = Form(...),
+    subject: str = Form(...),
+    message: str = Form(...),
+    current_user=Depends(get_current_user)
+):
+
+    name = name.strip()
+    subject = subject.strip()
+    message = message.strip()
+
+    if not name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Name is required"
+        )
+
+    if not subject:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Subject is required"
+        )
+
+    if not message:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message is required"
+        )
+
+    now = datetime.now(timezone.utc)
+
+    query = {
+        "user_id": current_user["_id"],
+        "name": name,
+        "email": current_user["email"],
+        "subject": subject,
+        "message": message,
+        "status": "pending",
+        "created_at": now,
+        "updated_at": now
+    }
+
+    result = queries_collection.insert_one(query)
+
+    return {
+        "message": "Your query has been submitted successfully",
+        "query_id": str(result.inserted_id)
+    }
 
