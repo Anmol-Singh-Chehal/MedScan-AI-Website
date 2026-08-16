@@ -110,57 +110,28 @@ export default function ContactUs() {
 
           <form className="flex flex-col gap-5">
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="name"
+                className="font-primary text-sm font-medium text-primary"
+              >
+                Name
+              </label>
 
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="name"
-                  className="font-primary text-sm font-medium text-primary"
-                >
-                  Name
-                </label>
-
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Your name"
-                  className="
-                    h-11
-                    rounded-xl
-                    bg-paper-2/40
-                    border-muted/20
-                    text-primary
-                    placeholder:text-secondary/50
-                    focus-visible:ring-muted/30
-                  "
-                />
-              </div>
-
-
-              <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="email"
-                  className="font-primary text-sm font-medium text-primary"
-                >
-                  Email
-                </label>
-
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="
-                    h-11
-                    rounded-xl
-                    bg-paper-2/40
-                    border-muted/20
-                    text-primary
-                    placeholder:text-secondary/50
-                    focus-visible:ring-muted/30
-                  "
-                />
-              </div>
-
+              <Input
+                id="name"
+                type="text"
+                placeholder="Your name"
+                className="
+                  h-11
+                  rounded-xl
+                  bg-paper-2/40
+                  border-muted/20
+                  text-primary
+                  placeholder:text-secondary/50
+                  focus-visible:ring-muted/30
+                "
+              />
             </div>
 
             <div className="flex flex-col gap-2">

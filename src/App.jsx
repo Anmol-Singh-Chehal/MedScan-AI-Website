@@ -13,6 +13,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import VerifyCode from './pages/VerifyCode'
 import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
+import ResetPassword from './pages/ResetPassword'
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path='/verify-code' element={<VerifyCode/>}/>
         <Route path='/profile' element={<Profile/>}/>
         <Route path='/edit-profile' element={<EditProfile/>}/>
+        <Route path='/update-password' element={<ResetPassword/>}/>
       </Routes>
 
       <Footer/>
