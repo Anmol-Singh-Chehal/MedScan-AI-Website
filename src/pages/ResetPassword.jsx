@@ -1,24 +1,45 @@
 import React, { useState } from "react";
-import { Eye, EyeOff, LockKeyhole, ArrowRight, ArrowLeft, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, ArrowRight, ShieldCheck } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters.")
+      .regex(/[A-Za-z]/, "Password must contain at least one letter.")
+      .regex(/[0-9]/, "Password must contain at least one number."),
+
+    confirmPassword: z.string().min(1, "Please confirm your password."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
 
 export default function ResetPassword() {
-  const {theme, setTheme} = useTheme();
+  const { theme } = useTheme();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const passwordsMatch = confirmPassword === "" || password === confirmPassword;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-      return;
-    }
-
-    console.log("Password reset");
+  const onSubmit = (data) => {
+    console.log("Password reset:", data);
   };
 
   return (
@@ -44,8 +65,9 @@ export default function ResetPassword() {
 
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-7 space-y-5">
 
+            {/* New Password */}
             <div className="flex flex-col gap-2">
 
               <label className="text-sm font-semibold text-primary font-primary">
@@ -58,34 +80,31 @@ export default function ResetPassword() {
 
                 <input
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your new password"
-                  required
-                  minLength={8}
-                  className="w-full h-12 rounded-xl border border-muted/25 bg-paper-2/20 pl-10 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:border-muted focus:ring-2 focus:ring-muted/15 font-secondary"
+                  {...register("password")}
+                  className={`w-full h-12 rounded-xl border ${errors.password ? "border-red-500" : "border-muted/25"} bg-paper-2/20 pl-10 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:ring-2 focus:ring-muted/15 font-secondary`}
                 />
 
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-muted cursor-pointer"
-                >
-                  {showPassword ? (
-                    <EyeOff className="size-4" />
-                  ) : (
-                    <Eye className="size-4" />
-                  )}
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-muted cursor-pointer">
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
 
               </div>
 
-              <p className="text-xs text-secondary font-secondary">
-                Use at least 8 characters with a combination of letters and numbers.
-              </p>
+              {errors.password ? (
+                <p className="text-xs text-red-500 font-secondary">
+                  {errors.password.message}
+                </p>
+              ) : (
+                <p className="text-xs text-secondary font-secondary">
+                  Use at least 8 characters with a combination of letters and numbers.
+                </p>
+              )}
 
             </div>
 
+
+            {/* Confirm Password */}
             <div className="flex flex-col gap-2">
 
               <label className="text-sm font-semibold text-primary font-primary">
@@ -98,36 +117,27 @@ export default function ResetPassword() {
 
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your new password"
-                  required
-                  minLength={8}
-                  className={`w-full h-12 rounded-xl border bg-paper-2/20 pl-10 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:ring-2 focus:ring-muted/15 font-secondary ${passwordsMatch ? "border-muted/25 focus:border-muted" : "border-red-400 focus:border-red-400"}`}
+                  {...register("confirmPassword")}
+                  className={`w-full h-12 rounded-xl border ${errors.confirmPassword ? "border-red-500" : "border-muted/25"} bg-paper-2/20 pl-10 pr-11 text-sm text-primary placeholder:text-secondary/60 outline-none transition focus:ring-2 focus:ring-muted/15 font-secondary`}
                 />
 
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-muted cursor-pointer"
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="size-4" />
-                  ) : (
-                    <Eye className="size-4" />
-                  )}
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-muted cursor-pointer">
+                  {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                 </button>
 
               </div>
 
-              {!passwordsMatch && (
+              {errors.confirmPassword && (
                 <p className="text-xs text-red-500 font-secondary">
-                  Passwords do not match.
+                  {errors.confirmPassword.message}
                 </p>
               )}
 
             </div>
 
+
+            {/* Security Notice */}
             <div className="flex items-start gap-3 rounded-2xl border border-muted/15 bg-muted/5 p-4">
 
               <ShieldCheck className="size-5 shrink-0 text-muted mt-0.5" />
@@ -138,13 +148,16 @@ export default function ResetPassword() {
 
             </div>
 
+
+            {/* Submit */}
             <button
               type="submit"
-              disabled={!password || !confirmPassword || !passwordsMatch}
-              className={`w-full h-12 rounded-xl bg-muted flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)] ${theme==="light"? "text-white": "text-paper-1"} ${!password || !confirmPassword || !passwordsMatch ? "opacity-50 cursor-not-allowed hover:translate-y-0" : "text-white"}`}
+              disabled={isSubmitting}
+              className={`w-full h-12 rounded-xl bg-muted ${theme === "light" ? "text-white" : "text-paper-1"} flex items-center justify-center gap-2 font-primary font-semibold cursor-pointer transition-all duration-300 hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 shadow-[0_8px_25px_color-mix(in_srgb,var(--muted)_25%,transparent)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0`}
             >
-              Reset Password
-              <ArrowRight className="size-4" />
+              {isSubmitting ? "Updating..." : "Reset Password"}
+
+              {!isSubmitting && <ArrowRight className="size-4" />}
             </button>
 
           </form>
