@@ -8,6 +8,7 @@ db = client[settings.MONGODB_DATABASE]
 
 users_collection = db["users"]
 scans_collection = db["scans"]
+revoked_tokens_collection = db["revoked_tokens"]
 
 users_collection.create_index(
     "email",

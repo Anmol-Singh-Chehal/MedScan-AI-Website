@@ -14,10 +14,17 @@ from app.auth.password import (
     verify_password
 )
 from pymongo.errors import DuplicateKeyError
-from app.database.mongodb import users_collection
+from app.database.mongodb import users_collection, revoked_tokens_collection
 from app.auth.password import hash_password
 from app.services.cloudinary_service import upload_image, delete_image
 from app.auth.jwt import create_access_token
+from fastapi.security import HTTPAuthorizationCredentials
+from app.auth.dependencies import security
+from app.config.settings import settings
+import jwt
+from jwt.exceptions import InvalidTokenError
+
+from datetime import datetime, timezone
 
 router = APIRouter(
     prefix="/auth",
@@ -306,4 +313,44 @@ async def edit_profile(
             "updated_at": datetime.now(timezone.utc)
         }
     }
+
+@router.post("/sign-out")
+async def signout(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+
+        jti = payload.get("jti")
+        exp = payload.get("exp")
+
+        if not jti:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+
+        revoked_tokens_collection.insert_one({
+            "jti": jti,
+            "expires_at": datetime.fromtimestamp(
+                exp,
+                timezone.utc
+            ),
+            "revoked_at": datetime.now(timezone.utc)
+        })
+
+        return {
+            "message": "Successfully signed out"
+        }
+
+    except InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token"
+        )
 

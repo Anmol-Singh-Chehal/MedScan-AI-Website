@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
-
 import jwt
-
+import uuid
 from app.config.settings import settings
 
 
@@ -15,6 +14,7 @@ def create_access_token(user_id: str) -> str:
 
     payload = {
         "sub": user_id,
+        "jti": str(uuid.uuid4()),
         "iat": now,
         "exp": expiration
     }
