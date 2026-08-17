@@ -213,19 +213,11 @@ async def login(
 
 @router.put("/edit-profile")
 async def edit_profile(
-    profile_photo: UploadFile = File(...),
-    full_name: str = Form(...),
+    profile_photo: UploadFile | None = File(None),
+    full_name: str | None = Form(None),
     current_password: str = Form(...),
     current_user=Depends(get_current_user)
 ):
-
-    full_name = full_name.strip()
-
-    if not full_name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Full name is required"
-        )
 
     if not current_password:
         raise HTTPException(
@@ -244,53 +236,77 @@ async def edit_profile(
             detail="Current password is incorrect"
         )
 
-    user_id = str(current_user["_id"])
-    old_profile_photo = current_user.get(
-        "profile_photo"
-    )
+    full_name = full_name.strip() if full_name else None
 
-    try:
-        new_profile_result = upload_image(
-            profile_photo,
-            f"medscan-ai/users/{user_id}/profile"
-        )
-
-    except Exception:
+    if not full_name and profile_photo is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to upload new profile photo"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please provide either a profile photo or full name"
         )
 
+    user_id = str(current_user["_id"])
+
+    old_profile_photo = current_user.get("profile_photo")
+
+    update_data = {
+        "updated_at": datetime.now(timezone.utc)
+    }
+
+    new_profile_result = None
+
+    if full_name:
+        update_data["full_name"] = full_name
+
+    if profile_photo is not None:
+
+        try:
+            new_profile_result = upload_image(
+                profile_photo,
+                f"medscan-ai/users/{user_id}/profile"
+            )
+
+            update_data["profile_photo"] = new_profile_result
+
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to upload new profile photo"
+            )
+
     try:
+
         users_collection.update_one(
             {
                 "_id": current_user["_id"]
             },
             {
-                "$set": {
-                    "full_name": full_name,
-                    "profile_photo": new_profile_result,
-                    "updated_at": datetime.now(timezone.utc)
-                }
+                "$set": update_data
             }
         )
 
     except Exception:
-        delete_image(
-            new_profile_result["public_id"]
-        )
+
+        if new_profile_result:
+            try:
+                delete_image(
+                    new_profile_result["public_id"]
+                )
+            except Exception:
+                pass
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update profile"
         )
 
-    if old_profile_photo:
+    if new_profile_result and old_profile_photo:
+
         old_public_id = old_profile_photo.get(
             "public_id"
         )
 
         if old_public_id:
+
             try:
                 delete_image(
                     old_public_id
@@ -301,16 +317,32 @@ async def edit_profile(
                     f"Failed to delete old profile photo: {e}"
                 )
 
+    if new_profile_result:
+        profile_photo_url = new_profile_result["url"]
+
+    else:
+        profile_photo_url = (
+            old_profile_photo.get("url")
+            if old_profile_photo
+            else None
+        )
+
+    updated_at = update_data["updated_at"]
+
     return {
         "message": "Profile updated successfully",
 
         "user": {
             "id": user_id,
-            "full_name": full_name,
+            "full_name": (
+                full_name
+                if full_name
+                else current_user["full_name"]
+            ),
             "email": current_user["email"],
-            "profile_photo": new_profile_result["url"],
+            "profile_photo": profile_photo_url,
             "created_at": current_user["created_at"],
-            "updated_at": datetime.now(timezone.utc)
+            "updated_at": updated_at
         }
     }
 
