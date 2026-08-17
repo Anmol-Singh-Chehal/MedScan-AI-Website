@@ -4,6 +4,11 @@ import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocation } from "react-router-dom";
+import { useUpdatePasswordMutation } from "@/services/api";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/features/auth/authSlice.js";
 
 const resetPasswordSchema = z
   .object({
@@ -25,6 +30,12 @@ export default function ResetPassword() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const location = useLocation();
+  const email = location.state?.email;
+  const reset_token = location.state?.reset_token;
+  const [updatePassword] = useUpdatePasswordMutation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -38,8 +49,28 @@ export default function ResetPassword() {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log("Password reset:", data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await updatePassword({
+        email,
+        reset_token,
+        new_password: data.password,
+        confirm_password: data.confirmPassword,
+      }).unwrap();
+
+      dispatch(
+        setCredentials({
+          access_token: response.access_token,
+          user: response.user,
+          rememberMe: true,
+        })
+      );
+
+      alert(response?.message || "Password updated successfully!");
+      navigate("/");
+    } catch (error) {
+      alert(error?.data?.message || "Failed to update password.");
+    }
   };
 
   return (

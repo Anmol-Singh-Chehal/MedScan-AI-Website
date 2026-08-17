@@ -6,17 +6,39 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { useNavigate } from "react-router-dom";
+import { useVerifyCodeMutation } from "@/services/api";
+import { useLocation } from "react-router-dom";
 
 export default function VerifyCode() {
   const { theme } = useTheme();
   const [code, setCode] = useState("");
+  const [verifyCode] = useVerifyCodeMutation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (code.length !== 6) return;
 
-    console.log("Verification code:", code);
+    try {
+      const response = await verifyCode({
+        email,
+        code,
+      }).unwrap();
+
+      alert(response?.message || "Code verified successfully!");
+
+      navigate("/update-password", {
+        state: {
+          email,
+          reset_token: response.reset_token,
+        },
+      });
+    } catch (error) {
+      alert(error?.data?.message || "Invalid verification code.");
+    }
   };
 
   return (
