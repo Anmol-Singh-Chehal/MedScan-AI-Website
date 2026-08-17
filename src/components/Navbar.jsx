@@ -20,6 +20,8 @@ export default function Navbar() {
   const isAuthenticated = useSelector(
     (state) => state.auth.isAuthenticated
   );
+  const user = useSelector((state) => state.auth.user);
+  const profilePhoto = user?.profile_photo;
 
   function toggleMenu() {
     setMenuOpen(!menuOpen);
@@ -103,6 +105,36 @@ export default function Navbar() {
             <Button className={`btn-1 ${theme==="light"? "text-white": "text-paper-1"}`} onClick={()=>navigate("/sign-up")}>Sign Up</Button>
           </>)
         }
+
+        {isAuthenticated && (
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
+            className="
+              size-8 md:size-9
+              rounded-full
+              overflow-hidden
+              border border-muted/30
+              bg-muted/10
+              flex items-center justify-center
+              hover:ring-2 hover:ring-muted/30
+              transition-all duration-200
+              cursor-pointer
+            "
+          >
+            {user?.profile_photo ? (
+              <img
+                src={user.profile_photo}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-muted font-primary font-semibold text-sm">
+                {user?.full_name?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+            )}
+          </button>
+        )}
 
         <LuMenu
           className="

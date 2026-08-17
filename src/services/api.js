@@ -58,10 +58,12 @@ export const api = createApi({
     editProfile: builder.mutation({
       query: ({ profile_photo, full_name, current_password }) => {
         const formData = new FormData();
-
-        formData.append("profile_photo", profile_photo);
         formData.append("full_name", full_name);
         formData.append("current_password", current_password);
+
+        if (profile_photo instanceof File) {
+          formData.append("profile_photo", profile_photo);
+        }
 
         return {
           url: "/edit-profile",
