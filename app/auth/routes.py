@@ -40,13 +40,12 @@ router = APIRouter(
 
 @router.post("/sign-up")
 async def signup(
-    profile_photo: UploadFile = File(...),
+    profile_photo: UploadFile | None = File(None),
     full_name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
     accepts_terms: bool = Form(...)
 ):
-
 
     full_name = full_name.strip()
     email = email.strip().lower()
@@ -87,9 +86,7 @@ async def signup(
             detail="Email already present"
         )
 
-    hashed_password = hash_password(
-        password
-    )
+    hashed_password = hash_password(password)
 
     user = {
         "full_name": full_name,
@@ -100,11 +97,8 @@ async def signup(
         "updated_at": datetime.now(timezone.utc)
     }
 
-
     try:
-        result = users_collection.insert_one(
-            user
-        )
+        result = users_collection.insert_one(user)
 
     except DuplicateKeyError:
         raise HTTPException(
@@ -112,46 +106,46 @@ async def signup(
             detail="Email already present"
         )
 
+    user_id = str(result.inserted_id)
 
-    user_id = str(
-        result.inserted_id
-    )
+    profile_photo_url = None
 
-    try:
-        profile_result = upload_image(
-            profile_photo,
-            f"medscan-ai/users/{user_id}/profile"
-        )
+    if profile_photo is not None:
 
-    except Exception:
-        users_collection.delete_one(
-            {
-                "_id": result.inserted_id
-            }
-        )
+        try:
+            profile_result = upload_image(
+                profile_photo,
+                f"medscan-ai/users/{user_id}/profile"
+            )
 
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to upload profile photo"
-        )
+            profile_photo_url = profile_result["url"]
 
-    users_collection.update_one(
-        {
-            "_id": result.inserted_id
-        },
-        {
-            "$set": {
-                "profile_photo": profile_result
-            }
-        }
-    )
+            users_collection.update_one(
+                {
+                    "_id": result.inserted_id
+                },
+                {
+                    "$set": {
+                        "profile_photo": profile_result
+                    }
+                }
+            )
 
-    access_token = create_access_token(
-        user_id
-    )
+        except Exception:
+            users_collection.delete_one(
+                {
+                    "_id": result.inserted_id
+                }
+            )
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to upload profile photo"
+            )
+
+    access_token = create_access_token(user_id)
 
     return {
-
         "message": "User successfully registered",
         "access_token": access_token,
         "token_type": "bearer",
@@ -160,7 +154,7 @@ async def signup(
             "id": user_id,
             "full_name": full_name,
             "email": email,
-            "profile_photo": profile_result["url"]
+            "profile_photo": profile_photo_url
         }
     }
 
@@ -540,6 +534,7 @@ async def update_password(
         password_resets_collection.delete_one({
             "_id": reset_request["_id"]
         })
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Reset code has expired"
@@ -561,12 +556,35 @@ async def update_password(
         }
     )
 
+    # Get updated user
+    user = users_collection.find_one({
+        "_id": reset_request["user_id"]
+    })
+
+    # Generate new login access token
+    access_token = create_access_token(
+        str(reset_request["user_id"])
+    )
+
+    # Delete used reset request
     password_resets_collection.delete_one({
         "_id": reset_request["_id"]
     })
 
     return {
-        "message": "Password updated successfully"
+        "message": "Password updated successfully",
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in_days": 7,
+        "user": {
+            "id": str(user["_id"]),
+            "full_name": user["full_name"],
+            "email": user["email"],
+            "profile_photo": user.get(
+                "profile_photo",
+                {}
+            ).get("url")
+        }
     }
 
 @router.post("/contact-us")

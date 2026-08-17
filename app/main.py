@@ -1,4 +1,5 @@
 from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from app.database.mongodb import client
 from app.services.cloudinary_service import upload_image
 from app.auth.routes import router as auth_router
@@ -7,6 +8,16 @@ app = FastAPI(
     title="MedScan AI",
     description="Medical imaging AI backend",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(
