@@ -6,6 +6,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { motion } from "framer-motion";
 
 import ModelSelector from "@/components/ModelSelector";
 import UploadBox from "@/components/UploadBox";
@@ -54,7 +55,9 @@ export default function Detection() {
     isTbLoading;
 
   const canAnalyze =
-    selectedModel && images.length >= 1 && images.length <= 5;
+    selectedModel &&
+    images.length >= 1 &&
+    images.length <= 5;
 
   const handleAnalyze = async () => {
     if (!canAnalyze || isLoading) return;
@@ -90,10 +93,12 @@ export default function Detection() {
       navigate("/results", {
         state: {
           results: response,
+
           images: images.map((image) => ({
             filename: image.file.name,
             preview: image.preview,
           })),
+
           diseaseType: selectedModel,
         },
       });
@@ -129,7 +134,20 @@ export default function Detection() {
     >
       <div className="mx-auto max-w-7xl">
 
-        <section className="flex flex-col gap-4 mb-8">
+        {/* =====================================================
+            HEADER
+        ====================================================== */}
+
+        <motion.section
+          initial={{ opacity: 0, y: 25 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{
+            duration: 0.6,
+            ease: "easeOut",
+          }}
+          className="flex flex-col gap-4 mb-8"
+        >
           <Badge
             faIcon={"fa-search"}
             tag={"AI MEDICAL IMAGING"}
@@ -160,10 +178,14 @@ export default function Detection() {
               text-secondary
             "
           >
-            Select an appropriate AI model, upload your medical images,
-            and start the analysis workflow.
+            Select an appropriate AI model, upload your medical
+            images, and start the analysis workflow.
           </p>
-        </section>
+        </motion.section>
+
+        {/* =====================================================
+            MAIN CONTENT
+        ====================================================== */}
 
         <section
           className="
@@ -177,11 +199,23 @@ export default function Detection() {
           "
         >
 
-          {/* LEFT */}
-          <div
+          {/* =====================================================
+              LEFT PANEL
+          ====================================================== */}
+
+          <motion.div
+            initial={{ opacity: 0, y: 35 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{
+              duration: 0.7,
+              delay: 0.1,
+              ease: "easeOut",
+            }}
             className="
               rounded-2xl
-              border border-muted/20
+              border
+              border-muted/20
               bg-paper-1
               p-4
               sm:p-6
@@ -191,17 +225,35 @@ export default function Detection() {
           >
 
             {/* Model selection */}
-            <ModelSelector
-              value={selectedModel}
-              onChange={(value) => {
-                setSelectedModel(value);
-                setError("");
+
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.45,
+                delay: 0.15,
               }}
-            />
+            >
+              <ModelSelector
+                value={selectedModel}
+                onChange={(value) => {
+                  setSelectedModel(value);
+                  setError("");
+                }}
+              />
+            </motion.div>
 
             {/* Selected model */}
+
             {selectedModel && (
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: 0.97, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{
+                  duration: 0.35,
+                  ease: "easeOut",
+                }}
                 className="
                   mt-4
                   flex
@@ -209,8 +261,10 @@ export default function Detection() {
                   gap-3
                   rounded-xl
                   bg-muted/5
-                  border border-muted/10
-                  px-4 py-3
+                  border
+                  border-muted/10
+                  px-4
+                  py-3
                 "
               >
                 <div
@@ -244,20 +298,34 @@ export default function Detection() {
                     {selectedModel}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             )}
 
             {/* Upload */}
-            <div className="mt-5">
+
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.5,
+                delay: 0.2,
+              }}
+              className="mt-5"
+            >
               <UploadBox
                 images={images}
                 setImages={setImages}
               />
-            </div>
+            </motion.div>
 
             {/* Error */}
+
             {error && (
-              <div
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
                 className="
                   mt-4
                   rounded-xl
@@ -272,14 +340,33 @@ export default function Detection() {
                 "
               >
                 {error}
-              </div>
+              </motion.div>
             )}
 
             {/* Analyze */}
-            <button
+
+            <motion.button
               type="button"
               disabled={!canAnalyze || isLoading}
               onClick={handleAnalyze}
+              whileHover={
+                canAnalyze && !isLoading
+                  ? {
+                      y: -2,
+                      scale: 1.005,
+                    }
+                  : {}
+              }
+              whileTap={
+                canAnalyze && !isLoading
+                  ? {
+                      scale: 0.98,
+                    }
+                  : {}
+              }
+              transition={{
+                duration: 0.2,
+              }}
               className={`
                 group
                 mt-5
@@ -308,7 +395,6 @@ export default function Detection() {
                           : "text-paper-1"
                       }
                       shadow-[0_6px_20px_color-mix(in_srgb,var(--color-muted)_20%,transparent)]
-                      hover:-translate-y-0.5
                       hover:shadow-[0_10px_25px_color-mix(in_srgb,var(--color-muted)_30%,transparent)]
                     `
                     : `
@@ -325,7 +411,9 @@ export default function Detection() {
             >
               <ScanSearch className="size-4" />
 
-              {isLoading ? "Analyzing..." : "Analyze Images"}
+              {isLoading
+                ? "Analyzing..."
+                : "Analyze Images"}
 
               {!isLoading && (
                 <ArrowRight
@@ -341,7 +429,9 @@ export default function Detection() {
                   `}
                 />
               )}
-            </button>
+            </motion.button>
+
+            {/* Helper text */}
 
             <p
               className="
@@ -358,12 +448,32 @@ export default function Detection() {
                 ? "Upload at least one image to continue."
                 : images.length >= 5
                 ? "Maximum 5 images selected."
-                : `${images.length} image${images.length !== 1 ? "s" : ""} selected.`}
+                : `${images.length} image${
+                    images.length !== 1 ? "s" : ""
+                  } selected.`}
             </p>
 
-          </div>
+          </motion.div>
 
-          <DetectionTips />
+          {/* =====================================================
+              DETECTION TIPS
+          ====================================================== */}
+
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{
+              once: true,
+              amount: 0.15,
+            }}
+            transition={{
+              duration: 0.65,
+              delay: 0.2,
+              ease: "easeOut",
+            }}
+          >
+            <DetectionTips />
+          </motion.div>
 
         </section>
       </div>

@@ -155,17 +155,6 @@ export default function Results() {
                       </div>
                     </div>
 
-                    {/* PDF */}
-                    <button
-                      onClick={() =>
-                        console.log("Save PDF:", result)
-                      }
-                      className="btn-1 flex items-center justify-center gap-2 w-full sm:w-fit px-5 py-2.5"
-                    >
-                      <LuDownload size={17} />
-                      Save Report as PDF
-                    </button>
-
                   </div>
                 </div>
 
