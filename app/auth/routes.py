@@ -27,6 +27,15 @@ from jwt.exceptions import InvalidTokenError
 from app.auth.send_reset_code_email import send_reset_code_email
 import hashlib
 import secrets
+from fastapi import (
+    Request
+)
+from app.ml.predictor import (
+    predict_fracture,
+    predict_tumor,
+    predict_cancer,
+    predict_tb
+)
 
 def hash_reset_code(code: str):
     return hashlib.sha256(
@@ -668,4 +677,168 @@ async def contact_us(
         "message": "Your query has been submitted successfully",
         "query_id": str(result.inserted_id)
     }
+
+@router.post("/facture")
+async def fracture_detection(
+    request: Request,
+    image: UploadFile = File(...),
+    current_user=Depends(get_current_user)
+):
+
+    try:
+
+        model = request.app.state.models["fracture"]
+
+        result = await predict_fracture(
+            image,
+            model
+        )
+
+        return {
+            "success": True,
+            "disease_type": "fracture",
+            "filename": image.filename,
+            **result
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+
+    except Exception as e:
+
+        print(
+            f"Fracture prediction error: {e}"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Fracture prediction failed."
+        )
+
+@router.post("/tumor")
+async def tumor_detection(
+    request: Request,
+    image: UploadFile = File(...),
+    current_user=Depends(get_current_user)
+):
+
+    try:
+
+        model = request.app.state.models["tumor"]
+
+        result = await predict_tumor(
+            image,
+            model
+        )
+
+        return {
+            "success": True,
+            "disease_type": "brain_tumor",
+            "filename": image.filename,
+            **result
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+
+    except Exception as e:
+
+        print(
+            f"Tumor prediction error: {e}"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Tumor prediction failed."
+        )
+
+@router.post("/cancer")
+async def cancer_detection(
+    request: Request,
+    image: UploadFile = File(...),
+    current_user=Depends(get_current_user)
+):
+
+    try:
+
+        model = request.app.state.models["cancer"]
+
+        result = await predict_cancer(
+            image,
+            model
+        )
+
+        return {
+            "success": True,
+            "disease_type": "lung_cancer",
+            "filename": image.filename,
+            **result
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+
+    except Exception as e:
+
+        print(
+            f"Cancer prediction error: {e}"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Lung cancer prediction failed."
+        )
+
+@router.post("/tb")
+async def tb_detection(
+    request: Request,
+    image: UploadFile = File(...),
+    current_user=Depends(get_current_user)
+):
+
+    try:
+
+        model = request.app.state.models["tb"]
+
+        result = await predict_tb(
+            image,
+            model
+        )
+
+        return {
+            "success": True,
+            "disease_type": "tuberculosis",
+            "filename": image.filename,
+            **result
+        }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+
+    except Exception as e:
+
+        print(
+            f"TB prediction error: {e}"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="TB prediction failed."
+        )
 
