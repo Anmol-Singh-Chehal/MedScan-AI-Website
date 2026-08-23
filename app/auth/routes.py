@@ -15,7 +15,7 @@ from app.auth.password import (
     generate_reset_code
 )
 from pymongo.errors import DuplicateKeyError
-from app.database.mongodb import users_collection, revoked_tokens_collection, password_resets_collection, queries_collection
+from app.database.mongodb import users_collection, revoked_tokens_collection, password_resets_collection, queries_collection, scans_collection
 from app.auth.password import hash_password
 from app.services.cloudinary_service import upload_image, delete_image
 from app.auth.jwt import create_access_token
@@ -677,3 +677,37 @@ async def contact_us(
         "message": "Your query has been submitted successfully",
         "query_id": str(result.inserted_id)
     }
+
+@router.get("/prediction-history")
+async def prediction_history(
+    current_user=Depends(get_current_user)
+):
+    user_id = current_user["_id"]
+
+    scans = scans_collection.find(
+        {
+            "user_id": user_id
+        }
+    ).sort(
+        "created_at",
+        -1
+    )
+
+    history = []
+
+    for scan in scans:
+        history.append({
+            "id": str(scan["_id"]),
+            "disease_type": scan["disease_type"],
+            "model": scan["model"],
+            "total_images": scan["total_images"],
+            "images": scan["images"],
+            "created_at": scan["created_at"]
+        })
+
+    return {
+        "success": True,
+        "total_scans": len(history),
+        "history": history
+    }
+

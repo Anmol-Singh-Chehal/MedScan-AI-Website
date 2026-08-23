@@ -16,11 +16,18 @@ from app.ml.predictor import (
     predict_tb
 )
 
+from app.services.scan_service import save_prediction
+
+
 router = APIRouter(
     prefix="/detection",
     tags=["detection"]
 )
 
+
+# ============================================================
+# Fracture Detection
+# ============================================================
 
 @router.post("/fracture")
 async def fracture_detection(
@@ -29,17 +36,38 @@ async def fracture_detection(
     current_user=Depends(get_current_user)
 ):
     try:
+        # ----------------------------------------------------
+        # Get model
+        # ----------------------------------------------------
         model = request.app.state.models["fracture"]
 
+        # ----------------------------------------------------
+        # Run prediction
+        # ----------------------------------------------------
         result = await predict_fracture(
             images,
             model
         )
 
+        # ----------------------------------------------------
+        # Save scan + upload images
+        # ----------------------------------------------------
+        scan = await save_prediction(
+            user=current_user,
+            images=images,
+            disease_type="fracture",
+            model=result["model"],
+            predictions=result["predictions"]
+        )
+
+        # ----------------------------------------------------
+        # Return response
+        # ----------------------------------------------------
         return {
             "success": True,
             "disease_type": "fracture",
-            **result
+            **result,
+            "scan_id": str(scan["_id"])
         }
 
     except ValueError as e:
@@ -56,6 +84,11 @@ async def fracture_detection(
             detail="Fracture prediction failed."
         )
 
+
+# ============================================================
+# Brain Tumor Detection
+# ============================================================
+
 @router.post("/tumor")
 async def tumor_detection(
     request: Request,
@@ -63,17 +96,38 @@ async def tumor_detection(
     current_user=Depends(get_current_user)
 ):
     try:
+        # ----------------------------------------------------
+        # Get model
+        # ----------------------------------------------------
         model = request.app.state.models["tumor"]
 
+        # ----------------------------------------------------
+        # Run prediction
+        # ----------------------------------------------------
         result = await predict_tumor(
             images,
             model
         )
 
+        # ----------------------------------------------------
+        # Save scan + upload images
+        # ----------------------------------------------------
+        scan = await save_prediction(
+            user=current_user,
+            images=images,
+            disease_type="brain_tumor",
+            model=result["model"],
+            predictions=result["predictions"]
+        )
+
+        # ----------------------------------------------------
+        # Return response
+        # ----------------------------------------------------
         return {
             "success": True,
             "disease_type": "brain_tumor",
-            **result
+            **result,
+            "scan_id": str(scan["_id"])
         }
 
     except ValueError as e:
@@ -90,6 +144,11 @@ async def tumor_detection(
             detail="Tumor prediction failed."
         )
 
+
+# ============================================================
+# Lung Cancer Detection
+# ============================================================
+
 @router.post("/cancer")
 async def cancer_detection(
     request: Request,
@@ -97,17 +156,38 @@ async def cancer_detection(
     current_user=Depends(get_current_user)
 ):
     try:
+        # ----------------------------------------------------
+        # Get model
+        # ----------------------------------------------------
         model = request.app.state.models["cancer"]
 
+        # ----------------------------------------------------
+        # Run prediction
+        # ----------------------------------------------------
         result = await predict_cancer(
             images,
             model
         )
 
+        # ----------------------------------------------------
+        # Save scan + upload images
+        # ----------------------------------------------------
+        scan = await save_prediction(
+            user=current_user,
+            images=images,
+            disease_type="lung_cancer",
+            model=result["model"],
+            predictions=result["predictions"]
+        )
+
+        # ----------------------------------------------------
+        # Return response
+        # ----------------------------------------------------
         return {
             "success": True,
             "disease_type": "lung_cancer",
-            **result
+            **result,
+            "scan_id": str(scan["_id"])
         }
 
     except ValueError as e:
@@ -124,6 +204,11 @@ async def cancer_detection(
             detail="Lung cancer prediction failed."
         )
 
+
+# ============================================================
+# Tuberculosis Detection
+# ============================================================
+
 @router.post("/tb")
 async def tb_detection(
     request: Request,
@@ -131,17 +216,38 @@ async def tb_detection(
     current_user=Depends(get_current_user)
 ):
     try:
+        # ----------------------------------------------------
+        # Get model
+        # ----------------------------------------------------
         model = request.app.state.models["tb"]
 
+        # ----------------------------------------------------
+        # Run prediction
+        # ----------------------------------------------------
         result = await predict_tb(
             images,
             model
         )
 
+        # ----------------------------------------------------
+        # Save scan + upload images
+        # ----------------------------------------------------
+        scan = await save_prediction(
+            user=current_user,
+            images=images,
+            disease_type="tuberculosis",
+            model=result["model"],
+            predictions=result["predictions"]
+        )
+
+        # ----------------------------------------------------
+        # Return response
+        # ----------------------------------------------------
         return {
             "success": True,
             "disease_type": "tuberculosis",
-            **result
+            **result,
+            "scan_id": str(scan["_id"])
         }
 
     except ValueError as e:
