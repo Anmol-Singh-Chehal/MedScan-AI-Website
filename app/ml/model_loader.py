@@ -236,7 +236,7 @@ def load_tb_model():
 def load_all_models():
 
     print("=" * 60)
-    print("Loading Suraksha Kavach ML models")
+    print("Loading MedScan AI ML models")
     print("=" * 60)
 
     print(f"Device: {DEVICE}")

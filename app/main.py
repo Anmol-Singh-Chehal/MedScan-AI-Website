@@ -5,6 +5,7 @@ from app.database.mongodb import client
 from app.services.cloudinary_service import upload_image
 from app.auth.routes import router as auth_router
 from app.ml.model_loader import load_all_models
+from app.detection.routes import router as detection_router
 
 # uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
@@ -76,6 +77,9 @@ app.include_router(
     auth_router
 )
 
+app.include_router(
+    detection_router
+)
 
 # ============================================================
 # Root
