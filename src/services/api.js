@@ -4,7 +4,7 @@ export const api = createApi({
   reducerPath: "api",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://127.0.0.1:8000/auth",
+    baseUrl: "http://127.0.0.1:8000",
 
     prepareHeaders: (headers, { getState }) => {
       const token = getState().auth.token;
@@ -20,20 +20,32 @@ export const api = createApi({
   tagTypes: ["User", "Prediction", "History"],
 
   endpoints: (builder) => ({
+
+    // ============================================================
+    // AUTH
+    // ============================================================
+
     signup: builder.mutation({
-      query: ({ profile_photo, full_name, email, password, accepts_terms }) => {
+      query: ({
+        profile_photo,
+        full_name,
+        email,
+        password,
+        accepts_terms,
+      }) => {
         const formData = new FormData();
 
         if (profile_photo) {
           formData.append("profile_photo", profile_photo);
         }
+
         formData.append("full_name", full_name);
         formData.append("email", email);
         formData.append("password", password);
         formData.append("accepts_terms", accepts_terms);
 
         return {
-          url: "/sign-up",
+          url: "/auth/sign-up",
           method: "POST",
           body: formData,
         };
@@ -48,7 +60,7 @@ export const api = createApi({
         formData.append("password", password);
 
         return {
-          url: "/log-in",
+          url: "/auth/log-in",
           method: "POST",
           body: formData,
         };
@@ -56,8 +68,13 @@ export const api = createApi({
     }),
 
     editProfile: builder.mutation({
-      query: ({ profile_photo, full_name, current_password }) => {
+      query: ({
+        profile_photo,
+        full_name,
+        current_password,
+      }) => {
         const formData = new FormData();
+
         formData.append("full_name", full_name);
         formData.append("current_password", current_password);
 
@@ -66,7 +83,7 @@ export const api = createApi({
         }
 
         return {
-          url: "/edit-profile",
+          url: "/auth/edit-profile",
           method: "PUT",
           body: formData,
         };
@@ -77,7 +94,7 @@ export const api = createApi({
 
     logout: builder.mutation({
       query: () => ({
-        url: "/sign-out",
+        url: "/auth/sign-out",
         method: "POST",
       }),
     }),
@@ -89,7 +106,7 @@ export const api = createApi({
         formData.append("email", email);
 
         return {
-          url: "/forgot-password",
+          url: "/auth/forgot-password",
           method: "POST",
           body: formData,
         };
@@ -104,7 +121,7 @@ export const api = createApi({
         formData.append("code", code);
 
         return {
-          url: "/verify-code",
+          url: "/auth/verify-code",
           method: "POST",
           body: formData,
         };
@@ -126,7 +143,7 @@ export const api = createApi({
         formData.append("confirm_password", confirm_password);
 
         return {
-          url: "/update-password",
+          url: "/auth/update-password",
           method: "POST",
           body: formData,
         };
@@ -142,16 +159,101 @@ export const api = createApi({
         formData.append("message", message);
 
         return {
-          url: "/contact-us",
+          url: "/auth/contact-us",
           method: "POST",
           body: formData,
         };
       },
     }),
+
+    getPredictionHistory: builder.query({
+      query: () => ({
+        url: "/auth/prediction-history",
+        method: "GET",
+      }),
+      providesTags: ["History"],
+    }),
+
+    // ============================================================
+    // DETECTION
+    // ============================================================
+
+    fractureDetection: builder.mutation({
+      query: (images) => {
+        const formData = new FormData();
+
+        images.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        return {
+          url: "/detection/fracture",
+          method: "POST",
+          body: formData,
+        };
+      },
+
+      invalidatesTags: ["Prediction", "History"],
+    }),
+
+    tumorDetection: builder.mutation({
+      query: (images) => {
+        const formData = new FormData();
+
+        images.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        return {
+          url: "/detection/tumor",
+          method: "POST",
+          body: formData,
+        };
+      },
+
+      invalidatesTags: ["Prediction", "History"],
+    }),
+
+    cancerDetection: builder.mutation({
+      query: (images) => {
+        const formData = new FormData();
+
+        images.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        return {
+          url: "/detection/cancer",
+          method: "POST",
+          body: formData,
+        };
+      },
+
+      invalidatesTags: ["Prediction", "History"],
+    }),
+
+    tbDetection: builder.mutation({
+      query: (images) => {
+        const formData = new FormData();
+
+        images.forEach((image) => {
+          formData.append("images", image);
+        });
+
+        return {
+          url: "/detection/tb",
+          method: "POST",
+          body: formData,
+        };
+      },
+
+      invalidatesTags: ["Prediction", "History"],
+    }),
   }),
 });
 
 export const {
+  // Auth
   useSignupMutation,
   useLoginMutation,
   useEditProfileMutation,
@@ -160,4 +262,11 @@ export const {
   useVerifyCodeMutation,
   useUpdatePasswordMutation,
   useContactUsMutation,
+  useGetPredictionHistoryQuery,
+
+  // Detection
+  useFractureDetectionMutation,
+  useTumorDetectionMutation,
+  useCancerDetectionMutation,
+  useTbDetectionMutation,
 } = api;

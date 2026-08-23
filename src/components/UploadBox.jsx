@@ -14,8 +14,13 @@ export default function UploadBox({ images, setImages }) {
   const handleFiles = (selectedFiles) => {
     if (!selectedFiles?.length) return;
 
+    const remainingSlots = 5 - images.length;
+
+    if (remainingSlots <= 0) return;
+
     const newImages = Array.from(selectedFiles)
       .filter((file) => file.type.startsWith("image/"))
+      .slice(0, remainingSlots)
       .map((file) => ({
         id: crypto.randomUUID(),
         file,
@@ -214,7 +219,7 @@ export default function UploadBox({ images, setImages }) {
           <FileImage className="size-4 text-muted" />
 
           <span className="font-secondary text-xs text-secondary">
-            PNG · JPG · JPEG · WEBP
+            Maximum 5 images · PNG · JPG · JPEG · WEBP
           </span>
         </div>
 

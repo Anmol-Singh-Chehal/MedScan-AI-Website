@@ -12,36 +12,14 @@ import { useTheme } from "next-themes";
 
 const models = {
   "X-ray": [
-    "Pneumonia detection",
-    "Tuberculosis detection",
     "Bone fracture detection",
-    "Chest disease classification",
+    "Tuberculosis detection",
   ],
-
   MRI: [
-    "Brain tumor classification",
-    "Alzheimer's classification",
-    "Brain tissue abnormalities",
+    "Brain tumor detection",
   ],
-
   CT: [
-    "Lung cancer",
-    "Pulmonary diseases",
-  ],
-
-  Ultrasound: [
-    "Breast cancer",
-    "Liver disease",
-  ],
-
-  "Dermoscopic images": [
-    "Skin cancer / melanoma",
-  ],
-
-  "Dental X-rays": [
-    "Dental caries",
-    "Bone loss",
-    "Tooth classification",
+    "Lung cancer detection",
   ],
 };
 
