@@ -13,9 +13,14 @@ import {
   LoaderCircle,
 } from "lucide-react";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { useGetPredictionHistoryQuery } from "@/services/api";
+import { useLogoutMutation } from "@/services/api";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { logout } from "@/features/auth/authSlice";
+
 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -30,24 +35,30 @@ export default function Profile() {
   } = useGetPredictionHistoryQuery();
 
   const predictionHistory = data?.history || [];
+  const [logoutMutation] = useLogoutMutation();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
 
-  const [generatingReport, setGeneratingReport] =
-    React.useState(null);
+  const totalImagesAnalyzed = predictionHistory.reduce(
+    (total, scan) =>
+      total + (scan?.total_images ?? scan?.images?.length ?? 0),
+    0
+  );
 
-  // ============================================================
-  // CLOUDINARY URL
-  // ============================================================
-  //
-  // Converts Cloudinary image URL to JPEG.
-  //
-  // Example:
-  // https://res.cloudinary.com/demo/image/upload/v123/file.png
-  //
-  // becomes:
-  // https://res.cloudinary.com/demo/image/upload/f_jpg,q_auto/v123/file.png
-  //
-  // JPEG is more reliably supported by jsPDF.
-  //
+  const [generatingReport, setGeneratingReport] = React.useState(null);
+
+  const handleSignOut = async () => {
+    try {
+      await logoutMutation().unwrap();
+    } catch (error) {
+      console.error("Sign out API failed:", error);
+    } finally {
+      dispatch(logout());
+      navigate("/");
+    }
+  };
+
   const getCloudinaryPdfUrl = (url) => {
     if (!url) return "";
 
@@ -742,52 +753,80 @@ export default function Profile() {
         {/* =====================================================
             TOP SECTION
         ====================================================== */}
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
           {/* ===================================================
               PROFILE CARD
           ==================================================== */}
-
           <section className="rounded-3xl border border-muted/20 bg-paper-2/20 sm:px-4 md:px-8 py-6 lg:p-12">
 
             <div className="flex flex-col items-center text-center">
 
+              {/* Profile Avatar */}
               <div className="size-28 sm:size-32 rounded-full border-2 border-muted/30 bg-paper-1 flex items-center justify-center overflow-hidden">
-                <UserRound className="size-14 sm:size-16 text-muted" />
+                {user?.profile_photo ? (
+                  <img
+                    src={user.profile_photo}
+                    alt={user?.name || "Profile"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <UserRound className="size-14 sm:size-16 text-muted" />
+                )}
               </div>
 
+              {/* Name */}
               <h2 className="mt-5 text-xl sm:text-2xl font-primary font-bold text-primary">
-                Anmol Singh
+                {user?.name || user?.full_name || "User"}
               </h2>
 
+              {/* Role */}
               <p className="mt-1 text-sm text-secondary font-secondary">
-                Medical Imaging Researcher
+                MedScan AI User
               </p>
 
             </div>
 
-            <div className="mt-8 pt-6 border-t border-muted/15">
-
+            {/* Last Scan */}
+            <div className="mt-6 pt-6 border-t border-muted/15">
               <p className="text-xs uppercase tracking-wide text-secondary font-secondary">
-                Member since
+                Last scan
               </p>
 
               <div className="mt-2 flex items-center gap-2 text-primary font-primary">
-                <CalendarDays className="size-4 text-muted" />
-                August 2026
-              </div>
+                <ScanLine className="size-4 text-muted" />
 
+                {predictionHistory?.length > 0 &&
+                predictionHistory[0]?.created_at
+                  ? new Date(
+                      predictionHistory[0].created_at
+                    ).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "No scans yet"}
+              </div>
             </div>
 
+            {/* Sign Out */}
+            <button
+              onClick={handleSignOut}
+              type="button"
+              className="mt-6 w-full bg-red-400 border border-red-400 px-4 py-2.5 rounded-xl cursor-pointer font-primary font-medium text-white transition-all duration-200 hover:bg-red-500"
+            >
+              Sign Out
+            </button>
+
           </section>
+
 
           {/* ===================================================
               PERSONAL INFORMATION
           ==================================================== */}
-
           <section className="rounded-3xl border border-muted/20 bg-paper-2/20 sm:px-4 md:px-8 py-6 lg:p-12 lg:col-span-2">
 
+            {/* Section Header */}
             <div>
 
               <h2 className="text-xl sm:text-2xl font-primary font-semibold text-primary">
@@ -795,15 +834,20 @@ export default function Profile() {
               </h2>
 
               <p className="mt-1 text-sm text-secondary font-secondary">
-                Your account details and scanning activity.
+                Manage your account details and view your medical imaging activity.
               </p>
 
             </div>
 
+
+            {/* =================================================
+                INFORMATION CARDS
+            ================================================== */}
             <div className="mt-7 grid sm:grid-cols-1 md:grid-cols-2 gap-4">
 
-              {/* Name */}
-
+              {/* =================================================
+                  FULL NAME
+              ================================================== */}
               <div className="rounded-2xl border border-muted/15 bg-paper-1/40 p-5">
 
                 <div className="flex items-center gap-4">
@@ -818,8 +862,8 @@ export default function Profile() {
                       Full name
                     </p>
 
-                    <p className="mt-1 text-sm sm:text-base font-semibold text-primary font-primary">
-                      Anmol Singh
+                    <p className="mt-1 text-sm sm:text-base font-semibold text-primary font-primary truncate">
+                      {user?.name || user?.full_name || "N/A"}
                     </p>
 
                   </div>
@@ -828,8 +872,10 @@ export default function Profile() {
 
               </div>
 
-              {/* Email */}
 
+              {/* =================================================
+                  EMAIL
+              ================================================== */}
               <div className="rounded-2xl border border-muted/15 bg-paper-1/40 p-5">
 
                 <div className="flex items-center gap-4">
@@ -845,7 +891,7 @@ export default function Profile() {
                     </p>
 
                     <p className="mt-1 text-sm sm:text-base font-semibold text-primary font-primary truncate">
-                      anmol@example.com
+                      {user?.email || "N/A"}
                     </p>
 
                   </div>
@@ -854,8 +900,10 @@ export default function Profile() {
 
               </div>
 
-              {/* Total Scans */}
 
+              {/* =================================================
+                  TOTAL SCANS
+              ================================================== */}
               <div className="rounded-2xl border border-muted/15 bg-paper-1/40 p-5">
 
                 <div className="flex items-center gap-4">
@@ -880,24 +928,26 @@ export default function Profile() {
 
               </div>
 
-              {/* Account Status */}
 
+              {/* =================================================
+                  IMAGES ANALYZED
+              ================================================== */}
               <div className="rounded-2xl border border-muted/15 bg-paper-1/40 p-5">
 
                 <div className="flex items-center gap-4">
 
                   <div className="size-11 rounded-xl bg-muted/10 flex items-center justify-center shrink-0">
-                    <Activity className="size-5 text-muted" />
+                    <Brain className="size-5 text-muted" />
                   </div>
 
                   <div>
 
                     <p className="text-xs text-secondary font-secondary">
-                      Account status
+                      Images analyzed
                     </p>
 
-                    <p className="mt-1 text-sm sm:text-base font-semibold text-muted font-primary">
-                      Active
+                    <p className="mt-1 text-xl font-bold text-primary font-primary">
+                      {totalImagesAnalyzed}
                     </p>
 
                   </div>
@@ -908,8 +958,10 @@ export default function Profile() {
 
             </div>
 
-            {/* Security */}
 
+            {/* =================================================
+                ACCOUNT SECURITY
+            ================================================== */}
             <div className="mt-8 pt-6 border-t border-muted/15">
 
               <h3 className="text-base sm:text-lg font-primary font-semibold text-primary">
@@ -917,11 +969,14 @@ export default function Profile() {
               </h3>
 
               <p className="mt-1 text-sm text-secondary font-secondary">
-                Manage your profile information and account password.
+                Manage your profile and account security settings.
               </p>
 
+
+              {/* Security Buttons */}
               <div className="mt-5 flex flex-col sm:flex-row gap-3 items-center justify-center">
 
+                {/* Edit Profile */}
                 <NavLink
                   to="/edit-profile"
                   className={`font-medium bg-muted ${
@@ -930,10 +985,15 @@ export default function Profile() {
                       : "text-paper-1"
                   } flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md cursor-pointer ring-2 ring-muted sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}
                 >
+
                   <Pencil className="sm:size-4" />
+
                   <h3>Edit Profile</h3>
+
                 </NavLink>
 
+
+                {/* Reset Password */}
                 <NavLink
                   to="/forgot-password"
                   className={`font-medium text-muted flex lg:gap-2 items-center lg:px-4 lg:py-2 lg:text-lg rounded-md ring-2 hover:bg-muted ${
@@ -942,8 +1002,11 @@ export default function Profile() {
                       : "hover:text-paper-1"
                   } hover:ring-2 hover:ring-muted bg-muted/10 ring-muted/40 cursor-pointer sm:text-sm sm:px-2 sm:py-2 sm:gap-1 font-primary`}
                 >
+
                   <KeyRound className="sm:size-4" />
+
                   Reset Password
+
                 </NavLink>
 
               </div>

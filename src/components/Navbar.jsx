@@ -6,13 +6,10 @@ import { useState, useRef, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "@/features/auth/authSlice";
-import { useLogoutMutation } from "@/services/api";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [logoutMutation] = useLogoutMutation();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const navRef = useRef(null);
@@ -21,7 +18,6 @@ export default function Navbar() {
     (state) => state.auth.isAuthenticated
   );
   const user = useSelector((state) => state.auth.user);
-  const profilePhoto = user?.profile_photo;
 
   function toggleMenu() {
     setMenuOpen(!menuOpen);
@@ -45,17 +41,7 @@ export default function Navbar() {
     };
   }, [menuOpen]);
 
-  const handleSignOut = async () => {
-    try {
-      await logoutMutation().unwrap();
-    } catch (error) {
-      console.error("Sign out API failed:", error);
-    } finally {
-      dispatch(logout());
-      setMenuOpen(false);
-      navigate("/");
-    }
-  };
+  
 
 
   return (
@@ -326,13 +312,6 @@ export default function Navbar() {
           </NavLink>
 
         </div>
-
-        <button
-          onClick={handleSignOut}
-          className='bg-red-400 border-red-400 border px-4 py-2 rounded-xl cursor-pointer mx-8'
-        >
-          Sign Out
-        </button>
       </div>
 
     </nav>
