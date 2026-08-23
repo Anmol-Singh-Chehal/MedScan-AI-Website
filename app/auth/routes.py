@@ -678,26 +678,28 @@ async def contact_us(
         "query_id": str(result.inserted_id)
     }
 
-@router.post("/facture")
+# ============================================================
+# Fracture Detection
+# ============================================================
+
+@router.post("/fracture")
 async def fracture_detection(
     request: Request,
-    image: UploadFile = File(...),
+    images: list[UploadFile] = File(...),
     current_user=Depends(get_current_user)
 ):
-
     try:
 
         model = request.app.state.models["fracture"]
 
         result = await predict_fracture(
-            image,
+            images,
             model
         )
 
         return {
             "success": True,
             "disease_type": "fracture",
-            "filename": image.filename,
             **result
         }
 
@@ -719,26 +721,29 @@ async def fracture_detection(
             detail="Fracture prediction failed."
         )
 
+
+# ============================================================
+# Brain Tumor Detection
+# ============================================================
+
 @router.post("/tumor")
 async def tumor_detection(
     request: Request,
-    image: UploadFile = File(...),
+    images: list[UploadFile] = File(...),
     current_user=Depends(get_current_user)
 ):
-
     try:
 
         model = request.app.state.models["tumor"]
 
         result = await predict_tumor(
-            image,
+            images,
             model
         )
 
         return {
             "success": True,
             "disease_type": "brain_tumor",
-            "filename": image.filename,
             **result
         }
 
@@ -760,26 +765,29 @@ async def tumor_detection(
             detail="Tumor prediction failed."
         )
 
+
+# ============================================================
+# Lung Cancer Detection
+# ============================================================
+
 @router.post("/cancer")
 async def cancer_detection(
     request: Request,
-    image: UploadFile = File(...),
+    images: list[UploadFile] = File(...),
     current_user=Depends(get_current_user)
 ):
-
     try:
 
         model = request.app.state.models["cancer"]
 
         result = await predict_cancer(
-            image,
+            images,
             model
         )
 
         return {
             "success": True,
             "disease_type": "lung_cancer",
-            "filename": image.filename,
             **result
         }
 
@@ -801,26 +809,29 @@ async def cancer_detection(
             detail="Lung cancer prediction failed."
         )
 
+
+# ============================================================
+# Tuberculosis Detection
+# ============================================================
+
 @router.post("/tb")
 async def tb_detection(
     request: Request,
-    image: UploadFile = File(...),
+    images: list[UploadFile] = File(...),
     current_user=Depends(get_current_user)
 ):
-
     try:
 
         model = request.app.state.models["tb"]
 
         result = await predict_tb(
-            image,
+            images,
             model
         )
 
         return {
             "success": True,
             "disease_type": "tuberculosis",
-            "filename": image.filename,
             **result
         }
 
@@ -841,4 +852,3 @@ async def tb_detection(
             status_code=500,
             detail="TB prediction failed."
         )
-
