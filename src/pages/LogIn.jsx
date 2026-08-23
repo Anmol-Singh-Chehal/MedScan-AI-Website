@@ -251,28 +251,6 @@ export default function LogIn() {
 
               <div className="h-px flex-1 bg-muted/20"></div>
 
-              <span className="text-xs text-secondary font-secondary">
-                or continue with
-              </span>
-
-              <div className="h-px flex-1 bg-muted/20"></div>
-
-            </div>
-
-
-            {/* Social Login */}
-            <div className="grid grid-cols-2 gap-3">
-
-              <button type="button" className="h-11 rounded-xl border border-muted/20 bg-paper-2/10 text-primary font-secondary text-sm font-medium hover:bg-muted/10 transition cursor-pointer flex items-center justify-center gap-2">
-                <img src={googleIcon} alt="google" className="sm:size-6 lg:size-8" />
-                Google
-              </button>
-
-              <button type="button" className="h-11 rounded-xl border border-muted/20 bg-paper-2/10 text-primary font-secondary text-sm font-medium hover:bg-muted/10 transition cursor-pointer flex items-center justify-center gap-2">
-                <img src={facebookIcon} alt="facebook" className="sm:size-6 lg:size-8" />
-                Facebook
-              </button>
-
             </div>
 
 

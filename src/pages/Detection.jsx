@@ -12,6 +12,7 @@ import ModelSelector from "@/components/ModelSelector";
 import UploadBox from "@/components/UploadBox";
 import DetectionTips from "@/components/DetectionTips";
 import Badge from "@/components/Badge";
+import { useSelector } from "react-redux";
 
 import {
   useFractureDetectionMutation,
@@ -27,6 +28,10 @@ export default function Detection() {
   const [selectedModel, setSelectedModel] = useState("");
   const [images, setImages] = useState([]);
   const [error, setError] = useState("");
+
+  const isAuthenticated = useSelector(
+    (state) => state.auth.isAuthenticated
+  );
 
   const [
     fractureDetection,
@@ -60,7 +65,17 @@ export default function Detection() {
     images.length <= 5;
 
   const handleAnalyze = async () => {
-    if (!canAnalyze || isLoading) return;
+    if (isLoading) return;
+
+    // User must be authenticated to perform detection
+    if (!isAuthenticated) {
+      navigate("/log-in");
+      alert("Please login first.")
+      return;
+    }
+
+    // Only continue with detection if the form is valid
+    if (!canAnalyze) return;
 
     setError("");
 
@@ -344,7 +359,6 @@ export default function Detection() {
             )}
 
             {/* Analyze */}
-
             <motion.button
               type="button"
               disabled={!canAnalyze || isLoading}
@@ -353,82 +367,163 @@ export default function Detection() {
                 canAnalyze && !isLoading
                   ? {
                       y: -2,
-                      scale: 1.005,
+                      scale: 1.01,
                     }
                   : {}
               }
               whileTap={
                 canAnalyze && !isLoading
                   ? {
-                      scale: 0.98,
+                      scale: 0.97,
                     }
                   : {}
               }
               transition={{
-                duration: 0.2,
+                type: "spring",
+                stiffness: 400,
+                damping: 25,
               }}
               className={`
-                group
-                mt-5
-                w-full
-                flex
-                items-center
-                justify-center
-                gap-2
-                rounded-xl
-                px-5
-                py-3
-                font-primary
-                text-sm
-                font-semibold
-                transition-all
-                duration-300
-
+                group relative mt-5 w-full overflow-hidden
+                rounded-2xl px-5 py-3.5
+                font-primary text-sm font-semibold
+                transition-all duration-300
                 ${
                   canAnalyze && !isLoading
                     ? `
-                      bg-muted
                       cursor-pointer
+                      bg-muted
                       ${
                         theme === "light"
                           ? "text-white"
                           : "text-paper-1"
                       }
-                      shadow-[0_6px_20px_color-mix(in_srgb,var(--color-muted)_20%,transparent)]
-                      hover:shadow-[0_10px_25px_color-mix(in_srgb,var(--color-muted)_30%,transparent)]
+                      shadow-[0_8px_25px_color-mix(in_srgb,var(--color-muted)_22%,transparent)]
+                      hover:shadow-[0_12px_32px_color-mix(in_srgb,var(--color-muted)_35%,transparent)]
                     `
                     : `
+                      cursor-not-allowed
                       bg-muted/10
                       ${
-                        theme === "light"
-                          ? "text-white/50"
-                          : "text-paper-1/40"
+                        theme === "dark"
+                          ? "text-white/40"
+                          : "text-primary/40"
                       }
-                      cursor-not-allowed
                     `
                 }
               `}
             >
-              <ScanSearch className="size-4" />
-
-              {isLoading
-                ? "Analyzing..."
-                : "Analyze Images"}
-
-              {!isLoading && (
-                <ArrowRight
-                  className={`
-                    size-4
-                    transition-transform
-                    duration-300
-                    ${
-                      canAnalyze
-                        ? "group-hover:translate-x-1"
-                        : ""
-                    }
-                  `}
+              {/* Animated shine */}
+              {canAnalyze && !isLoading && (
+                <motion.span
+                  className="
+                    absolute inset-y-0 -left-1/2 w-1/3
+                    skew-x-[-20deg]
+                    bg-white/10
+                  "
+                  animate={{
+                    left: ["-40%", "130%"],
+                  }}
+                  transition={{
+                    duration: 2.8,
+                    repeat: Infinity,
+                    repeatDelay: 2,
+                    ease: "easeInOut",
+                  }}
                 />
               )}
+
+              {/* Loading progress */}
+              {isLoading && (
+                <motion.span
+                  className="
+                    absolute bottom-0 left-0 h-[2px]
+                    bg-current/60
+                  "
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+              )}
+
+              {/* Content */}
+              <span className="relative z-10 flex items-center justify-center gap-2.5">
+                {isLoading ? (
+                  <>
+                    {/* Spinner */}
+                    <motion.span
+                      className="
+                        size-4 rounded-full
+                        border-2 border-current/25
+                        border-t-current
+                      "
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 0.8,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    />
+
+                    <span>Analyzing Images...</span>
+
+                    {/* Animated dots */}
+                    <span className="flex gap-0.5">
+                      {[0, 1, 2].map((dot) => (
+                        <motion.span
+                          key={dot}
+                          className="size-1 rounded-full bg-current/70"
+                          animate={{
+                            opacity: [0.25, 1, 0.25],
+                            y: [0, -2, 0],
+                          }}
+                          transition={{
+                            duration: 0.8,
+                            repeat: Infinity,
+                            delay: dot * 0.15,
+                          }}
+                        />
+                      ))}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <motion.span
+                      className="flex items-center justify-center"
+                      animate={
+                        canAnalyze
+                          ? {
+                              scale: [1, 1.05, 1],
+                            }
+                          : {}
+                      }
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <ScanSearch className="size-4" />
+                    </motion.span>
+
+                    <span>
+                      {canAnalyze ? "Analyze Images" : "Analyze Images"}
+                    </span>
+
+                    <ArrowRight
+                      className="
+                        size-4
+                        transition-transform duration-300
+                        group-hover:translate-x-1
+                      "
+                    />
+                  </>
+                )}
+              </span>
             </motion.button>
 
             {/* Helper text */}

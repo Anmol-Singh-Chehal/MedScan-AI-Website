@@ -307,13 +307,13 @@ export default function SignUp() {
                 <div>
                   <p className="text-xs leading-relaxed text-secondary font-secondary">
                     I agree to the{" "}
-                    <span className="text-muted font-medium cursor-pointer hover:underline">
+                    <NavLink to={"/terms-and-privacy"} className="text-muted font-medium cursor-pointer hover:underline">
                       Terms of Service
-                    </span>{" "}
+                    </NavLink>{" "}
                     and{" "}
-                    <span className="text-muted font-medium cursor-pointer hover:underline">
+                    <NavLink to={"/terms-and-privacy"} className="text-muted font-medium cursor-pointer hover:underline">
                       Privacy Policy
-                    </span>.
+                    </NavLink>.
                   </p>
 
                   {errors.terms && (
@@ -333,20 +333,6 @@ export default function SignUp() {
 
             <div className="flex items-center gap-3 my-7">
               <div className="h-px flex-1 bg-muted/20"></div>
-              <span className="text-xs text-secondary font-secondary">or continue with</span>
-              <div className="h-px flex-1 bg-muted/20"></div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <button type="button" className="h-11 rounded-xl border border-muted/20 bg-paper-2/10 text-primary font-secondary text-sm font-medium hover:bg-muted/10 transition cursor-pointer flex items-center justify-center gap-2">
-                <img src={googleIcon} alt="google" className="sm:size-6 lg:size-8" />
-                Google
-              </button>
-
-              <button type="button" className="h-11 rounded-xl border border-muted/20 bg-paper-2/10 text-primary font-secondary text-sm font-medium hover:bg-muted/10 transition cursor-pointer flex items-center justify-center gap-2">
-                <img src={facebookIcon} alt="facebook" className="sm:size-6 lg:size-8" />
-                Facebook
-              </button>
             </div>
 
             <p className="mt-6 text-center text-xs text-secondary font-secondary">

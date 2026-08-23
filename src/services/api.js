@@ -174,6 +174,14 @@ export const api = createApi({
       providesTags: ["History"],
     }),
 
+    getQueries: builder.query({
+      query: () => ({
+        url: "/auth/get-queries",
+        method: "GET",
+      }),
+      providesTags: ["Queries"],
+    }),
+
     // ============================================================
     // DETECTION
     // ============================================================
@@ -263,6 +271,7 @@ export const {
   useUpdatePasswordMutation,
   useContactUsMutation,
   useGetPredictionHistoryQuery,
+  useGetQueriesQuery,
 
   // Detection
   useFractureDetectionMutation,
