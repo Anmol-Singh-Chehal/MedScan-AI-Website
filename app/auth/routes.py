@@ -696,13 +696,24 @@ async def prediction_history(
     history = []
 
     for scan in scans:
+
+        created_at = scan.get("created_at")
+
+        # Ensure UTC datetime is returned with timezone information
+        if created_at is not None:
+
+            if created_at.tzinfo is None:
+                created_at = created_at.replace(tzinfo=timezone.utc)
+
+            created_at = created_at.isoformat()
+
         history.append({
             "id": str(scan["_id"]),
             "disease_type": scan["disease_type"],
             "model": scan["model"],
             "total_images": scan["total_images"],
             "images": scan["images"],
-            "created_at": scan["created_at"]
+            "created_at": created_at
         })
 
     return {
@@ -711,3 +722,49 @@ async def prediction_history(
         "history": history
     }
 
+@router.get("/get-queries")
+async def get_queries(
+    current_user=Depends(get_current_user)
+):
+    queries = queries_collection.find().sort(
+        "created_at",
+        -1
+    )
+
+    result = []
+
+    for query in queries:
+        created_at = query.get("created_at")
+        updated_at = query.get("updated_at")
+
+        if created_at and created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+
+        if updated_at and updated_at.tzinfo is None:
+            updated_at = updated_at.replace(tzinfo=timezone.utc)
+
+        result.append({
+            "id": str(query["_id"]),
+            "user_id": str(query["user_id"]),
+            "name": query["name"],
+            "email": query["email"],
+            "subject": query["subject"],
+            "message": query["message"],
+            "status": query.get("status", "pending"),
+            "created_at": (
+                created_at.isoformat()
+                if created_at
+                else None
+            ),
+            "updated_at": (
+                updated_at.isoformat()
+                if updated_at
+                else None
+            ),
+        })
+
+    return {
+        "success": True,
+        "total_queries": len(result),
+        "queries": result,
+    }
