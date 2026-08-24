@@ -58,18 +58,18 @@ export default function Footer() {
 
         <div className='flex flex-col gap-3'>
           <h3 className='sm:text-lg font-medium text-primary font-secondary'>Explore</h3>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Disease Detection</a>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Disease Library</a>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Crop Information</a>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Dashboard</a>
+          <NavLink to={"/"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Disease Detection</NavLink>
+          <NavLink to={"/"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Disease Library</NavLink>
+          <NavLink to={"/"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Crop Information</NavLink>
+          <NavLink to={"/"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Dashboard</NavLink>
         </div>
 
         <div className='flex flex-col gap-3'>
           <h3 className='sm:text-lg font-medium text-primary font-secondary'>Company</h3>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>About Us</a>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>FAQ</a>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Contact Us</a>
-          <a href="" className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>How It Works ?</a>
+          <NavLink to={"/about-us"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>About Us</NavLink>
+          <NavLink to={"/about-us"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>FAQ</NavLink>
+          <NavLink to={"/contact-us"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>Contact Us</NavLink>
+          <NavLink to={"/"} className='text-secondary font-secondary sm:text-sm hover:text-muted w-fit'>How It Works ?</NavLink>
         </div>
       </section>
 
