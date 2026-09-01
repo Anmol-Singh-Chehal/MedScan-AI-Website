@@ -55,7 +55,6 @@ This README documents the complete research methodology, model performance, syst
 - [API Reference](#-api-reference-indicative)
 - [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
-- [Project Structure](#-project-structure)
 - [References](#-references)
 - [Future Work](#-future-work)
 - [License](#-license)
@@ -601,37 +600,6 @@ BACKEND_URL=
 
 ---
 
-## 📁 Project Structure
-
-```
-medscan-ai/
-├── backend/
-│   ├── models/               # 4 trained PyTorch models (.pt / .pth)
-│   ├── routers/
-│   │   ├── auth.py
-│   │   ├── detection.py      # /detection/fracture, /tb, /cancer, /tumor
-│   │   ├── reports.py
-│   │   └── users.py
-│   ├── core/
-│   │   ├── security.py       # JWT handling
-│   │   └── config.py
-│   ├── main.py
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/             # Login, Signup, Dashboard, Upload, Profile, Report
-│   │   ├── components/
-│   │   ├── redux/             # store, slices (auth, scan, report)
-│   │   ├── routes/            # React Router DOM config
-│   │   └── App.jsx
-│   ├── index.html
-│   └── package.json
-│
-└── README.md
-```
-
----
 
 ## 📚 References
 
@@ -659,4 +627,4 @@ medscan-ai/
 ---
 
 ## 📋 For more detailed review on results you can go to this MedScan AI Research repository:
-> from here you can download all the results and Code files. here is the link: 
+> from here you can download all the results and Code files. here is the link: [https://github.com/Anmol-Singh-Chehal/MedScan-AI-Research.git](https://github.com/Anmol-Singh-Chehal/MedScan-AI-Research.git)
